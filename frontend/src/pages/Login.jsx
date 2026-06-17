@@ -11,14 +11,10 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = async (e, role) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const res = await api.post('/login', { username, password });
-      if(role && res.data.role !== role) {
-          setError(`Akun ini tidak memiliki akses sebagai ${role}`);
-          return;
-      }
       login(res.data.accessToken, res.data);
       navigate('/dashboard');
     } catch (err) {
@@ -39,7 +35,7 @@ const Login = () => {
 
         {error && <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-center text-sm">{error}</div>}
 
-        <form>
+        <form onSubmit={handleLogin}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">Username</label>
             <input 
@@ -62,16 +58,10 @@ const Login = () => {
           </div>
           <div className="flex gap-4">
             <button 
-              onClick={(e) => handleLogin(e, 'Staff')}
-              className="w-full bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105"
+              type="submit"
+              className="w-full bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold py-3 px-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md"
             >
-              Login Staff
-            </button>
-            <button 
-              onClick={(e) => handleLogin(e, 'Admin')}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105"
-            >
-              Login Admin
+              Masuk
             </button>
           </div>
         </form>

@@ -1,46 +1,28 @@
-const { Barang, Kategori, BarangMasuk, BarangKeluar } = require('../models');
+const { Aset, Mutasi, Peminjaman, Maintenance, Penghapusan } = require('../models');
 
 exports.getDashboardStats = async (req, res) => {
   try {
-    const totalAsetResult = await Barang.findAll({
-      attributes: [
-        [Barang.sequelize.fn('SUM', Barang.sequelize.literal('harga_barang * jumlah_stok')), 'total_nilai']
-      ],
-      raw: true
-    });
-    const totalAset = totalAsetResult[0]?.total_nilai || 0;
-
-    const totalBarang = await Barang.count();
-    const totalKategori = await Kategori.count();
-    const totalStok = await Barang.sum('jumlah_stok');
+    const totalAset = await Aset.count({ where: { status: ['Tersedia', 'Dipinjam', 'Maintenance'] } }); // Exclude Dihapus? Or include all. Let's include all.
+    const allAset = await Aset.count();
+    const asetDipinjam = await Aset.count({ where: { status: 'Dipinjam' } });
+    const asetMaintenance = await Aset.count({ where: { status: 'Maintenance' } });
+    const asetDihapus = await Aset.count({ where: { status: 'Dihapus' } });
     
-    const totalBarangMasuk = await BarangMasuk.count();
-    const totalBarangKeluar = await BarangKeluar.count();
-    
-    // Kategori stats for chart
-    const kategoriStats = await Barang.findAll({
-      attributes: [
-        'kategori_id',
-        [Barang.sequelize.fn('COUNT', Barang.sequelize.col('id_barang')), 'total']
-      ],
-      include: [{ model: Kategori, as: 'kategori', attributes: ['nama_kategori'] }],
-      group: ['kategori_id']
+    // Aktivitas Terbaru (Gabungan mutasi, peminjaman, dll - asumsikan ambil 5 peminjaman terakhir)
+    const recentActivity = await Peminjaman.findAll({
+      limit: 5,
+      order: [['created_at', 'DESC']],
+      include: ['aset']
     });
 
     res.json({
-      summary: {
-        totalAset: totalAset || 0,
-        totalBarang,
-        totalKategori,
-        totalStok: totalStok || 0,
-        totalBarangMasuk,
-        totalBarangKeluar
-      },
-      charts: {
-        kategoriStats
-      }
+      totalAset: allAset,
+      asetDipinjam,
+      asetMaintenance,
+      asetDihapus,
+      recentActivity
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 };

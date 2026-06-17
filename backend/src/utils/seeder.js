@@ -11,7 +11,7 @@ const seedData = async () => {
     // Seed Users
     await User.bulkCreate([
       { username: 'admin', password_hash: passwordHash, nama: 'Administrator', role: 'Admin' },
-      { username: 'staff', password_hash: passwordHash, nama: 'Staff Inventaris', role: 'Staff' }
+      { username: 'staff', password_hash: passwordHash, nama: 'Staff', role: 'Staff' }
     ]);
 
     // Seed Kategori

@@ -21,7 +21,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm py-4 px-6 flex justify-between items-center ml-64 z-10">
+    <header className="bg-white shadow-sm py-4 px-6 flex justify-between items-center ml-64 z-10 print:hidden">
       <h1 className="text-xl font-bold text-gray-800">Sistem Aset Manajemen</h1>
       <div className="flex items-center gap-6">
         <span className="text-sm text-gray-500 font-medium">{time}</span>

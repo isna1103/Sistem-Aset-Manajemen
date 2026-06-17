@@ -20,10 +20,9 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  role: {
-    type: DataTypes.ENUM('Admin', 'Staff'),
-    allowNull: false,
-    defaultValue: 'Staff'
+  role_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true // Allow null initially for migration
   }
 }, {
   tableName: 'users',

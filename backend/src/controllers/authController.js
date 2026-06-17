@@ -1,11 +1,21 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const { User, Role, Permission } = require('../models');
 
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ where: { username } });
+    const user = await User.findOne({ 
+      where: { username },
+      include: [{
+        model: Role,
+        as: 'role_info',
+        include: [{
+          model: Permission,
+          as: 'permissions'
+        }]
+      }]
+    });
 
     if (!user) {
       return res.status(404).json({ message: 'User Not found.' });
@@ -16,7 +26,9 @@ exports.login = async (req, res) => {
       return res.status(401).json({ accessToken: null, message: 'Invalid Password!' });
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
+    const roleName = user.role_info ? user.role_info.nama_role : null;
+
+    const token = jwt.sign({ id: user.id, role_id: user.role_id, role: roleName }, process.env.JWT_SECRET, {
       expiresIn: 86400 // 24 hours
     });
 
@@ -24,7 +36,9 @@ exports.login = async (req, res) => {
       id: user.id,
       username: user.username,
       nama: user.nama,
-      role: user.role,
+      role: roleName,
+      role_id: user.role_id,
+      permissions: user.role_info ? user.role_info.permissions : [],
       accessToken: token
     });
   } catch (error) {

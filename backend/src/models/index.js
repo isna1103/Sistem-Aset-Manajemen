@@ -1,29 +1,75 @@
 const User = require('./User');
+const Role = require('./Role');
+const Permission = require('./Permission');
+const RolePermission = require('./RolePermission');
 const Kategori = require('./Kategori');
-const Barang = require('./Barang');
-const BarangMasuk = require('./BarangMasuk');
-const BarangKeluar = require('./BarangKeluar');
+const Aset = require('./Aset');
+const Mutasi = require('./Mutasi');
+const Peminjaman = require('./Peminjaman');
+const Maintenance = require('./Maintenance');
+const StockOpname = require('./StockOpname');
+const Penghapusan = require('./Penghapusan');
 
 // Associations
-Kategori.hasMany(Barang, { foreignKey: 'kategori_id', as: 'barang' });
-Barang.belongsTo(Kategori, { foreignKey: 'kategori_id', as: 'kategori' });
 
-Barang.hasMany(BarangMasuk, { foreignKey: 'barang_id', as: 'barang_masuk' });
-BarangMasuk.belongsTo(Barang, { foreignKey: 'barang_id', as: 'barang' });
+// Roles & Permissions
+Role.belongsToMany(Permission, { through: RolePermission, foreignKey: 'role_id', as: 'permissions' });
+Permission.belongsToMany(Role, { through: RolePermission, foreignKey: 'permission_id', as: 'roles' });
 
-Barang.hasMany(BarangKeluar, { foreignKey: 'barang_id', as: 'barang_keluar' });
-BarangKeluar.belongsTo(Barang, { foreignKey: 'barang_id', as: 'barang' });
+// Role & User
+Role.hasMany(User, { foreignKey: 'role_id', as: 'users' });
+User.belongsTo(Role, { foreignKey: 'role_id', as: 'role_info' });
 
-User.hasMany(BarangMasuk, { foreignKey: 'user_id', as: 'barang_masuk' });
-BarangMasuk.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+// Kategori & Aset
+Kategori.hasMany(Aset, { foreignKey: 'kategori_id', as: 'aset' });
+Aset.belongsTo(Kategori, { foreignKey: 'kategori_id', as: 'kategori' });
 
-User.hasMany(BarangKeluar, { foreignKey: 'user_id', as: 'barang_keluar' });
-BarangKeluar.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+// Aset & Mutasi
+Aset.hasMany(Mutasi, { foreignKey: 'aset_id', as: 'mutasi' });
+Mutasi.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
+
+// Aset & Peminjaman
+Aset.hasMany(Peminjaman, { foreignKey: 'aset_id', as: 'peminjaman' });
+Peminjaman.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
+
+// Aset & Maintenance
+Aset.hasMany(Maintenance, { foreignKey: 'aset_id', as: 'maintenance' });
+Maintenance.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
+
+// Aset & StockOpname
+Aset.hasMany(StockOpname, { foreignKey: 'aset_id', as: 'stock_opname' });
+StockOpname.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
+
+// Aset & Penghapusan
+Aset.hasMany(Penghapusan, { foreignKey: 'aset_id', as: 'penghapusan' });
+Penghapusan.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
+
+// User associations (Admin/Staff who process the transactions)
+User.hasMany(Mutasi, { foreignKey: 'user_id', as: 'mutasi_diproses' });
+Mutasi.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+User.hasMany(Peminjaman, { foreignKey: 'user_id', as: 'peminjaman' });
+Peminjaman.belongsTo(User, { foreignKey: 'user_id', as: 'peminjam' });
+
+User.hasMany(Maintenance, { foreignKey: 'user_id', as: 'maintenance' });
+Maintenance.belongsTo(User, { foreignKey: 'user_id', as: 'teknisi' });
+
+User.hasMany(StockOpname, { foreignKey: 'user_id', as: 'stock_opname' });
+StockOpname.belongsTo(User, { foreignKey: 'user_id', as: 'pemeriksa' });
+
+User.hasMany(Penghapusan, { foreignKey: 'user_id', as: 'penghapusan' });
+Penghapusan.belongsTo(User, { foreignKey: 'user_id', as: 'penghapus' });
 
 module.exports = {
   User,
+  Role,
+  Permission,
+  RolePermission,
   Kategori,
-  Barang,
-  BarangMasuk,
-  BarangKeluar
+  Aset,
+  Mutasi,
+  Peminjaman,
+  Maintenance,
+  StockOpname,
+  Penghapusan
 };

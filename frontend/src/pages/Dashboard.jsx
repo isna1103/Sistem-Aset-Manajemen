@@ -1,123 +1,134 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Database, ArrowDownToLine, ArrowUpFromLine, Activity } from 'lucide-react';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import React, { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
+import { AuthContext } from '../context/AuthContext';
+import { Box, Wrench, ArrowUpFromLine, Trash2, Activity } from 'lucide-react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+} from 'chart.js';
+import { Bar, Doughnut } from 'react-chartjs-2';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-const DashboardCard = ({ title, value, icon, color }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 transition-transform hover:scale-105">
-    <div className={`p-4 rounded-full text-white ${color}`}>
-      {icon}
-    </div>
-    <div>
-      <p className="text-gray-500 text-sm font-medium">{title}</p>
-      <h3 className="text-2xl font-bold text-gray-800">{value}</h3>
-    </div>
-  </div>
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
 );
 
 const Dashboard = () => {
+  const { user } = useContext(AuthContext);
   const [stats, setStats] = useState({
-    summary: { totalAset: 0, totalBarang: 0, totalKategori: 0, totalStok: 0, totalBarangMasuk: 0, totalBarangKeluar: 0 },
-    charts: { kategoriStats: [] }
+    totalAset: 0,
+    asetDipinjam: 0,
+    asetMaintenance: 0,
+    asetDihapus: 0,
+    recentActivity: []
   });
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchDashboard = async () => {
       try {
         const res = await api.get('/dashboard');
         setStats(res.data);
       } catch (err) {
-        console.error('Error fetching stats', err);
+        console.error(err);
       }
     };
-    fetchStats();
+    fetchDashboard();
   }, []);
 
-  const formatRupiah = (number) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(number || 0);
-  };
-
-  const chartData = {
-    labels: stats.charts.kategoriStats.map(k => k.kategori?.nama_kategori || 'Unknown'),
+  const doughnutData = {
+    labels: ['Tersedia', 'Dipinjam', 'Maintenance', 'Dihapus'],
     datasets: [
       {
-        label: 'Jumlah Barang',
-        data: stats.charts.kategoriStats.map(k => k.total),
-        backgroundColor: 'rgba(22, 163, 74, 0.8)', // Green matching sidebar
-        borderColor: 'rgb(22, 163, 74)',
+        data: [
+          stats.totalAset - stats.asetDipinjam - stats.asetMaintenance - stats.asetDihapus,
+          stats.asetDipinjam,
+          stats.asetMaintenance,
+          stats.asetDihapus
+        ],
+        backgroundColor: [
+          'rgba(59, 130, 246, 0.8)', // blue
+          'rgba(234, 179, 8, 0.8)', // yellow
+          'rgba(249, 115, 22, 0.8)', // orange
+          'rgba(239, 68, 68, 0.8)', // red
+        ],
         borderWidth: 1,
-        borderRadius: 6
-      }
-    ]
+      },
+    ],
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: { precision: 0 } // Menghindari angka desimal pada sumbu Y
-      }
-    },
-    plugins: {
-      legend: { display: false }, // Menyembunyikan legend karena hanya ada 1 dataset
-      title: { display: true, text: 'Statistik Jumlah Barang Berdasarkan Kategori', font: { size: 16 } }
-    }
-  };
+  const cards = [
+    { title: 'Total Seluruh Aset', value: stats.totalAset, icon: <Box size={24} className="text-blue-600" />, bg: 'bg-blue-50' },
+    { title: 'Aset Dipinjam', value: stats.asetDipinjam, icon: <ArrowUpFromLine size={24} className="text-yellow-600" />, bg: 'bg-yellow-50' },
+    { title: 'Aset Maintenance', value: stats.asetMaintenance, icon: <Wrench size={24} className="text-orange-600" />, bg: 'bg-orange-50' },
+    { title: 'Aset Dihapus', value: stats.asetDihapus, icon: <Trash2 size={24} className="text-red-600" />, bg: 'bg-red-50' },
+  ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
-        <p className="text-gray-500">Ringkasan data inventaris aset hari ini</p>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Selamat datang, <span className="text-green-600">{user?.nama}</span>!
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <DashboardCard 
-          title="Total Nilai Aset" 
-          value={formatRupiah(stats.summary.totalAset)} 
-          icon={<Activity size={24} />} 
-          color="bg-blue-600 shadow-blue-500/50 shadow-lg"
-        />
-        <DashboardCard 
-          title="Total Barang" 
-          value={stats.summary.totalBarang} 
-          icon={<Box size={24} />} 
-          color="bg-green-600 shadow-green-500/50 shadow-lg"
-        />
-        <DashboardCard 
-          title="Total Kategori" 
-          value={stats.summary.totalKategori} 
-          icon={<Database size={24} />} 
-          color="bg-purple-600 shadow-purple-500/50 shadow-lg"
-        />
-        <DashboardCard 
-          title="Total Stok" 
-          value={stats.summary.totalStok} 
-          icon={<Box size={24} />} 
-          color="bg-orange-600 shadow-orange-500/50 shadow-lg"
-        />
-        <DashboardCard 
-          title="Barang Masuk" 
-          value={stats.summary.totalBarangMasuk} 
-          icon={<ArrowDownToLine size={24} />} 
-          color="bg-emerald-600 shadow-emerald-500/50 shadow-lg"
-        />
-        <DashboardCard 
-          title="Barang Keluar" 
-          value={stats.summary.totalBarangKeluar} 
-          icon={<ArrowUpFromLine size={24} />} 
-          color="bg-rose-600 shadow-rose-500/50 shadow-lg"
-        />
+        {cards.map((card, index) => (
+          <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+            <div className={`p-4 rounded-lg ${card.bg}`}>
+              {card.icon}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">{card.title}</p>
+              <h3 className="text-2xl font-bold text-gray-800 mt-1">{card.value}</h3>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mt-8">
-        <div className="h-80 flex justify-center">
-          <Bar data={chartData} options={chartOptions} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-bold text-gray-800 mb-6 border-b pb-2">Status Aset</h3>
+          <div className="flex justify-center h-64">
+            <Doughnut data={doughnutData} options={{ maintainAspectRatio: false }} />
+          </div>
+        </div>
+
+        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-bold text-gray-800 mb-6 border-b pb-2 flex items-center gap-2">
+            <Activity size={20} className="text-green-600" />
+            Aktivitas Peminjaman Terbaru
+          </h3>
+          <div className="space-y-4">
+            {stats.recentActivity.length > 0 ? (
+              stats.recentActivity.map((act, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 rounded-lg border border-gray-50 bg-gray-50/50">
+                  <div className={`w-2 h-2 rounded-full ${act.status === 'Dipinjam' ? 'bg-yellow-500' : 'bg-green-500'}`}></div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-800">{act.aset?.nama_aset}</p>
+                    <p className="text-sm text-gray-500">Tanggal Pinjam: {act.tanggal_pinjam}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${act.status === 'Dipinjam' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                      {act.status}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500 py-8">Belum ada aktivitas terbaru</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

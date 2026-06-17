@@ -1,73 +1,73 @@
-const { Barang, Kategori, BarangMasuk, BarangKeluar } = require('../models');
-const PDFDocument = require('pdfkit');
+const { Aset, Mutasi, Peminjaman, Maintenance, StockOpname, Kategori, User } = require('../models');
 
 exports.getLaporanAset = async (req, res) => {
   try {
-    const data = await Barang.findAll({
-      include: [{ model: Kategori, as: 'kategori', attributes: ['nama_kategori'] }]
+    const aset = await Aset.findAll({
+      include: [{ model: Kategori, as: 'kategori' }]
     });
-    res.json(data);
+    res.json(aset);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
-exports.getLaporanStok = async (req, res) => {
+exports.getLaporanPeminjaman = async (req, res) => {
   try {
-    // Assuming laporan stok is same as aset but specific fields
-    const data = await Barang.findAll({
-      attributes: ['kode_barang', 'nama_barang', 'jumlah_stok', 'satuan', 'lokasi_penyimpanan'],
-      include: [{ model: Kategori, as: 'kategori', attributes: ['nama_kategori'] }]
+    const peminjaman = await Peminjaman.findAll({
+      include: [
+        { model: Aset, as: 'aset' },
+        { model: User, as: 'peminjam', attributes: ['id', 'nama'] }
+      ],
+      order: [['created_at', 'DESC']]
     });
-    res.json(data);
+    res.json(peminjaman);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
-exports.exportPDF = async (req, res) => {
+exports.getLaporanMaintenance = async (req, res) => {
   try {
-    const barangList = await Barang.findAll({
-      include: [{ model: Kategori, as: 'kategori', attributes: ['nama_kategori'] }]
+    const maintenance = await Maintenance.findAll({
+      include: [
+        { model: Aset, as: 'aset' },
+        { model: User, as: 'teknisi', attributes: ['id', 'nama'] }
+      ],
+      order: [['created_at', 'DESC']]
     });
-
-    const doc = new PDFDocument({ margin: 30 });
-    let filename = 'Laporan_Aset.pdf';
-    
-    res.setHeader('Content-disposition', 'attachment; filename="' + filename + '"');
-    res.setHeader('Content-type', 'application/pdf');
-    
-    doc.pipe(res);
-    
-    // Header
-    doc.fontSize(20).text('Sistem Aset Manajemen', { align: 'center' });
-    doc.fontSize(16).text('Laporan Data Aset', { align: 'center' });
-    doc.moveDown();
-
-    // Table Header
-    doc.fontSize(12);
-    doc.text('Kode', 30, doc.y, { continued: true, width: 80 });
-    doc.text('Nama Barang', 110, doc.y, { continued: true, width: 150 });
-    doc.text('Kategori', 260, doc.y, { continued: true, width: 100 });
-    doc.text('Stok', 360, doc.y, { continued: true, width: 50 });
-    doc.text('Lokasi', 410, doc.y);
-    doc.moveDown();
-    
-    doc.moveTo(30, doc.y).lineTo(550, doc.y).stroke();
-    doc.moveDown();
-
-    // Table Content
-    barangList.forEach(b => {
-      doc.text(b.kode_barang, 30, doc.y, { continued: true, width: 80 });
-      doc.text(b.nama_barang, 110, doc.y, { continued: true, width: 150 });
-      doc.text(b.kategori?.nama_kategori || '-', 260, doc.y, { continued: true, width: 100 });
-      doc.text(b.jumlah_stok.toString(), 360, doc.y, { continued: true, width: 50 });
-      doc.text(b.lokasi_penyimpanan, 410, doc.y);
-      doc.moveDown(0.5);
-    });
-
-    doc.end();
+    res.json(maintenance);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
+
+exports.getLaporanMutasi = async (req, res) => {
+  try {
+    const mutasi = await Mutasi.findAll({
+      include: [
+        { model: Aset, as: 'aset' },
+        { model: User, as: 'user', attributes: ['id', 'nama'] }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+    res.json(mutasi);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getLaporanStockOpname = async (req, res) => {
+  try {
+    const opname = await StockOpname.findAll({
+      include: [
+        { model: Aset, as: 'aset' },
+        { model: User, as: 'pemeriksa', attributes: ['id', 'nama'] }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+    res.json(opname);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

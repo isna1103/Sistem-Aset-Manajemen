@@ -35,8 +35,15 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const hasPermission = (menu, action) => {
+    if (!user) return false;
+    if (user.role === 'Admin') return true; // Full access for Admin
+    if (!user.permissions || !Array.isArray(user.permissions)) return false;
+    return user.permissions.some(p => p.menu === menu && p.action === action);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, hasPermission }}>
       {children}
     </AuthContext.Provider>
   );
