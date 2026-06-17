@@ -55,6 +55,22 @@ const RoleForm = () => {
     }
   };
 
+  const handleSelectAllColumn = (action) => {
+    if (formData.nama_role === 'Admin') return;
+    
+    const permsInAction = allPermissions.filter(p => p.action === action).map(p => p.id);
+    if (permsInAction.length === 0) return;
+
+    const allSelected = permsInAction.every(id => selectedPermissions.includes(id));
+
+    if (allSelected) {
+      setSelectedPermissions(selectedPermissions.filter(id => !permsInAction.includes(id)));
+    } else {
+      const newSelected = new Set([...selectedPermissions, ...permsInAction]);
+      setSelectedPermissions(Array.from(newSelected));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -134,6 +150,27 @@ const RoleForm = () => {
                     </tr>
                   ))}
                 </tbody>
+                <tfoot className="bg-blue-50/30 border-t-2 border-gray-200">
+                  <tr>
+                    <td className="p-3 border border-gray-200 font-semibold text-gray-800 text-right">Pilih Semua (Select All)</td>
+                    {actions.map(action => {
+                      const permsInAction = allPermissions.filter(p => p.action === action).map(p => p.id);
+                      const allSelected = permsInAction.length > 0 && permsInAction.every(id => selectedPermissions.includes(id));
+                      return (
+                        <td key={action} className="p-3 border border-gray-200 text-center">
+                          <input 
+                            type="checkbox"
+                            className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                            checked={allSelected}
+                            onChange={() => handleSelectAllColumn(action)}
+                            disabled={formData.nama_role === 'Admin'}
+                            title={`Pilih semua akses ${action}`}
+                          />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

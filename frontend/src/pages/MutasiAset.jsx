@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 const MutasiAset = () => {
   const [mutasi, setMutasi] = useState([]);
   const [asetList, setAsetList] = useState([]);
+  const [lokasiList, setLokasiList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,12 +19,14 @@ const MutasiAset = () => {
 
   const fetchData = async () => {
     try {
-      const [mutasiRes, asetRes] = await Promise.all([
+      const [mutasiRes, asetRes, lokRes] = await Promise.all([
         api.get('/mutasi'),
-        api.get('/aset')
+        api.get('/aset'),
+        api.get('/lokasi')
       ]);
       setMutasi(mutasiRes.data);
       setAsetList(asetRes.data);
+      setLokasiList(lokRes.data);
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -114,9 +117,12 @@ const MutasiAset = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Lokasi Baru</label>
-                <input type="text" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
+                <select required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
                   value={formData.lokasi_baru} onChange={(e) => setFormData({...formData, lokasi_baru: e.target.value})}
-                />
+                >
+                  <option value="">Pilih Lokasi Baru</option>
+                  {lokasiList.map(l => <option key={l.id} value={l.nama_lokasi}>{l.nama_lokasi}</option>)}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Mutasi</label>

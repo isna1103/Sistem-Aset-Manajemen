@@ -9,6 +9,7 @@ import PengadaanAset from './pages/Aset/PengadaanAset';
 import DetailAset from './pages/Aset/DetailAset';
 import MutasiAset from './pages/MutasiAset';
 import PeminjamanAset from './pages/PeminjamanAset';
+import LaporanKerusakan from './pages/LaporanKerusakan';
 import MaintenanceAset from './pages/MaintenanceAset';
 import StockOpname from './pages/StockOpname';
 import PenghapusanAset from './pages/PenghapusanAset';
@@ -19,6 +20,7 @@ import RoleForm from './pages/RolePermission/RoleForm';
 import UserList from './pages/UserManagement/UserList';
 import UserForm from './pages/UserManagement/UserForm';
 import Kategori from './pages/Kategori';
+import Lokasi from './pages/Lokasi';
 
 const App = () => {
   return (
@@ -33,11 +35,13 @@ const App = () => {
             <Route path="aset" element={<PengadaanAset />} />
             <Route path="aset/detail/:kode_aset" element={<DetailAset />} />
             <Route path="kategori" element={<Kategori />} />
+            <Route path="lokasi" element={<Lokasi />} />
             
             <Route path="scan-qr" element={<ScanQR />} />
             
             <Route path="mutasi" element={<MutasiAset />} />
             <Route path="peminjaman" element={<PeminjamanAset />} />
+            <Route path="laporan-kerusakan" element={<LaporanKerusakan />} />
             <Route path="maintenance" element={<MaintenanceAset />} />
             <Route path="stock-opname" element={<StockOpname />} />
             <Route path="penghapusan" element={<PenghapusanAset />} />

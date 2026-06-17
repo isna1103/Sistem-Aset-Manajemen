@@ -29,7 +29,7 @@ const Aset = sequelize.define('Aset', {
     allowNull: false
   },
   kondisi: {
-    type: DataTypes.ENUM('Baik', 'Kurang Baik', 'Rusak'),
+    type: DataTypes.ENUM('Baik', 'Kurang Baik', 'Rusak', 'Hilang'),
     allowNull: false,
     defaultValue: 'Baik'
   },

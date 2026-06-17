@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Box, QrCode, ClipboardList, ArrowRightLeft, ArrowUpFromLine, Wrench, Trash2, FileText, Shield, Users, Tags } from 'lucide-react';
+import { LayoutDashboard, Box, QrCode, ClipboardList, ArrowRightLeft, ArrowUpFromLine, Wrench, Trash2, FileText, Shield, Users, Tags, MapPin } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 
 const Sidebar = () => {
@@ -9,10 +9,12 @@ const Sidebar = () => {
   const menuItems = [
     { title: 'Dashboard', menu: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { title: 'Kategori Barang', menu: 'Kategori', icon: <Tags size={20} />, path: '/kategori' },
-    { title: 'Pengadaan Aset', menu: 'Pengadaan Aset', icon: <Box size={20} />, path: '/aset' },
+    { title: 'Lokasi Aset', menu: 'Pengadaan Aset', icon: <MapPin size={20} />, path: '/lokasi' },
+    { title: 'Master Data Aset', menu: 'Pengadaan Aset', icon: <Box size={20} />, path: '/aset' },
     { title: 'Scan QR Code', menu: 'QR Code Tracking', icon: <QrCode size={20} />, path: '/scan-qr' },
     { title: 'Mutasi Aset', menu: 'Mutasi Aset', icon: <ArrowRightLeft size={20} />, path: '/mutasi' },
     { title: 'Peminjaman Aset', menu: 'Peminjaman Aset', icon: <ArrowUpFromLine size={20} />, path: '/peminjaman' },
+    { title: 'Laporan Kerusakan', menu: 'Laporan Kerusakan', icon: <ClipboardList size={20} />, path: '/laporan-kerusakan' },
     { title: 'Maintenance Aset', menu: 'Maintenance Aset', icon: <Wrench size={20} />, path: '/maintenance' },
     { title: 'Stock Opname', menu: 'Stock Opname', icon: <ClipboardList size={20} />, path: '/stock-opname' },
     { title: 'Penghapusan Aset', menu: 'Penghapusan Aset', icon: <Trash2 size={20} />, path: '/penghapusan' },

@@ -4,6 +4,7 @@ const router = express.Router();
 const { verifyToken, isAdmin, checkPermission } = require('../middlewares/authMiddleware');
 const authCtrl = require('../controllers/authController');
 const katCtrl = require('../controllers/kategoriController');
+const lokasiCtrl = require('../controllers/lokasiController');
 const dashCtrl = require('../controllers/dashboardController');
 
 const asetCtrl = require('../controllers/asetController');
@@ -14,6 +15,7 @@ const stockOpnameCtrl = require('../controllers/stockOpnameController');
 const penghapusanCtrl = require('../controllers/penghapusanController');
 const roleCtrl = require('../controllers/roleController');
 const laporanCtrl = require('../controllers/laporanController');
+const laporanKerusakanCtrl = require('../controllers/laporanKerusakanController');
 const userRoutes = require('./userRoutes');
 
 // Auth
@@ -27,16 +29,23 @@ router.use(verifyToken);
 router.get('/dashboard', checkPermission('Dashboard', 'Read/View'), dashCtrl.getDashboardStats);
 
 // Kategori 
-router.get('/kategori', checkPermission('Pengadaan Aset', 'Read/View'), katCtrl.getAll);
-router.get('/kategori/:id', checkPermission('Pengadaan Aset', 'Read/View'), katCtrl.getById);
+router.get('/kategori', katCtrl.getAll);
+router.get('/kategori/:id', katCtrl.getById);
 router.post('/kategori', checkPermission('Pengadaan Aset', 'Create'), katCtrl.create);
 router.put('/kategori/:id', checkPermission('Pengadaan Aset', 'Update'), katCtrl.update);
 router.delete('/kategori/:id', checkPermission('Pengadaan Aset', 'Delete'), katCtrl.delete);
 
+// Lokasi
+router.get('/lokasi', lokasiCtrl.getAll);
+router.get('/lokasi/:id', lokasiCtrl.getById);
+router.post('/lokasi', checkPermission('Pengadaan Aset', 'Create'), lokasiCtrl.create);
+router.put('/lokasi/:id', checkPermission('Pengadaan Aset', 'Update'), lokasiCtrl.update);
+router.delete('/lokasi/:id', checkPermission('Pengadaan Aset', 'Delete'), lokasiCtrl.delete);
+
 // Aset
-router.get('/aset', checkPermission('Pengadaan Aset', 'Read/View'), asetCtrl.getAll);
-router.get('/aset/:id', checkPermission('Pengadaan Aset', 'Read/View'), asetCtrl.getById);
-router.get('/aset/kode/:kode', checkPermission('QR Code Tracking', 'Read/View'), asetCtrl.getByKode); 
+router.get('/aset', asetCtrl.getAll);
+router.get('/aset/:id', asetCtrl.getById);
+router.get('/aset/kode/:kode', asetCtrl.getByKode); 
 router.post('/aset', checkPermission('Pengadaan Aset', 'Create'), asetCtrl.create);
 router.put('/aset/:id', checkPermission('Pengadaan Aset', 'Update'), asetCtrl.update);
 router.delete('/aset/:id', checkPermission('Pengadaan Aset', 'Delete'), asetCtrl.delete);
@@ -50,6 +59,13 @@ router.get('/peminjaman', checkPermission('Peminjaman Aset', 'Read/View'), pemin
 router.get('/peminjaman/me', checkPermission('Peminjaman Aset', 'Read/View'), peminjamanCtrl.getByUser); 
 router.post('/peminjaman', checkPermission('Peminjaman Aset', 'Create'), peminjamanCtrl.create);
 router.put('/peminjaman/:id/pengembalian', checkPermission('Pengembalian Aset', 'Create'), peminjamanCtrl.pengembalian); 
+router.delete('/peminjaman/:id', checkPermission('Peminjaman Aset', 'Delete'), peminjamanCtrl.delete);
+
+// Laporan Kerusakan
+const upload = require('../middlewares/uploadMiddleware');
+router.get('/laporan-kerusakan', checkPermission('Laporan Kerusakan', 'Read/View'), laporanKerusakanCtrl.getAll);
+router.post('/laporan-kerusakan', checkPermission('Laporan Kerusakan', 'Create'), upload.single('lampiran_file'), laporanKerusakanCtrl.create);
+router.put('/laporan-kerusakan/:id/review', checkPermission('Laporan Kerusakan', 'Update'), laporanKerusakanCtrl.review);
 
 // Maintenance
 router.get('/maintenance', checkPermission('Maintenance Aset', 'Read/View'), maintenanceCtrl.getAll);

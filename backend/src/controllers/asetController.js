@@ -32,12 +32,14 @@ exports.getByKode = async (req, res) => {
         { model: Kategori, as: 'kategori' },
         { model: require('../models').Peminjaman, as: 'peminjaman', include: [{ model: require('../models').User, as: 'peminjam' }] },
         { model: require('../models').Maintenance, as: 'maintenance', include: [{ model: require('../models').User, as: 'teknisi' }] },
+        { model: require('../models').LaporanKerusakan, as: 'laporan_kerusakan', include: [{ model: require('../models').User, as: 'pelapor' }] },
         { model: require('../models').Mutasi, as: 'mutasi', include: [{ model: require('../models').User, as: 'user' }] },
         { model: require('../models').StockOpname, as: 'stock_opname', include: [{ model: require('../models').User, as: 'pemeriksa' }] }
       ],
       order: [
         [{ model: require('../models').Peminjaman, as: 'peminjaman' }, 'created_at', 'DESC'],
         [{ model: require('../models').Maintenance, as: 'maintenance' }, 'created_at', 'DESC'],
+        [{ model: require('../models').LaporanKerusakan, as: 'laporan_kerusakan' }, 'created_at', 'DESC'],
         [{ model: require('../models').Mutasi, as: 'mutasi' }, 'created_at', 'DESC'],
         [{ model: require('../models').StockOpname, as: 'stock_opname' }, 'created_at', 'DESC']
       ]

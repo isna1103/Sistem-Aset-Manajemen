@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-import { ArrowLeft, Printer, History, Wrench, ArrowRightLeft, ClipboardCheck, Box } from 'lucide-react';
+import { ArrowLeft, Printer, History, Wrench, ArrowRightLeft, ClipboardCheck, Box, FileText } from 'lucide-react';
 
 const DetailAset = () => {
   const { kode_aset } = useParams();
@@ -101,6 +101,9 @@ const DetailAset = () => {
             <button onClick={() => setActiveTab('maintenance')} className={`flex items-center gap-2 px-6 py-3 font-medium text-sm rounded-t-lg transition-colors ${activeTab === 'maintenance' ? 'bg-white text-green-600 border-t-2 border-x border-green-600 border-b-0' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border border-transparent'}`}>
               <Wrench size={18} /> Maintenance ({aset.maintenance?.length || 0})
             </button>
+            <button onClick={() => setActiveTab('laporan')} className={`flex items-center gap-2 px-6 py-3 font-medium text-sm rounded-t-lg transition-colors ${activeTab === 'laporan' ? 'bg-white text-green-600 border-t-2 border-x border-green-600 border-b-0' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border border-transparent'}`}>
+              <FileText size={18} /> Laporan ({aset.laporan_kerusakan?.length || 0})
+            </button>
             <button onClick={() => setActiveTab('mutasi')} className={`flex items-center gap-2 px-6 py-3 font-medium text-sm rounded-t-lg transition-colors ${activeTab === 'mutasi' ? 'bg-white text-green-600 border-t-2 border-x border-green-600 border-b-0' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border border-transparent'}`}>
               <ArrowRightLeft size={18} /> Mutasi ({aset.mutasi?.length || 0})
             </button>
@@ -138,20 +141,63 @@ const DetailAset = () => {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="py-3 px-6 font-semibold text-gray-600">Tanggal</th>
-                    <th className="py-3 px-6 font-semibold text-gray-600">Deskripsi Pekerjaan</th>
-                    <th className="py-3 px-6 font-semibold text-gray-600">Teknisi</th>
+                    <th className="py-3 px-6 font-semibold text-gray-600">Tgl Mulai</th>
+                    <th className="py-3 px-6 font-semibold text-gray-600">Tgl Selesai</th>
+                    <th className="py-3 px-6 font-semibold text-gray-600">Deskripsi</th>
+                    <th className="py-3 px-6 font-semibold text-gray-600">Tindakan/Hasil</th>
                     <th className="py-3 px-6 font-semibold text-gray-600">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {aset.maintenance?.length === 0 && <tr><td colSpan="4" className="py-6 text-center text-gray-500">Belum ada riwayat maintenance</td></tr>}
+                  {aset.maintenance?.length === 0 && <tr><td colSpan="5" className="py-6 text-center text-gray-500">Belum ada riwayat maintenance</td></tr>}
                   {aset.maintenance?.map((m, i) => (
                     <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50">
                       <td className="py-3 px-6">{m.tanggal_maintenance}</td>
+                      <td className="py-3 px-6">{m.tanggal_selesai || '-'}</td>
                       <td className="py-3 px-6">{m.deskripsi}</td>
-                      <td className="py-3 px-6 font-medium">{m.teknisi?.nama}</td>
+                      <td className="py-3 px-6 text-gray-600 text-xs">
+                        {m.tindakan_perbaikan && <div><strong>Tindakan:</strong> {m.tindakan_perbaikan}</div>}
+                        {m.catatan_hasil && <div><strong>Hasil:</strong> {m.catatan_hasil}</div>}
+                        {m.biaya && <div><strong>Biaya:</strong> Rp {m.biaya.toLocaleString()}</div>}
+                      </td>
                       <td className="py-3 px-6"><span className={`px-2 py-1 rounded text-xs ${m.status === 'Proses' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>{m.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            {activeTab === 'laporan' && (
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-100">
+                    <th className="py-3 px-6 font-semibold text-gray-600">Tanggal</th>
+                    <th className="py-3 px-6 font-semibold text-gray-600">Pelapor</th>
+                    <th className="py-3 px-6 font-semibold text-gray-600">Deskripsi</th>
+                    <th className="py-3 px-6 font-semibold text-gray-600">Prioritas</th>
+                    <th className="py-3 px-6 font-semibold text-gray-600">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {aset.laporan_kerusakan?.length === 0 && <tr><td colSpan="5" className="py-6 text-center text-gray-500">Belum ada riwayat laporan</td></tr>}
+                  {aset.laporan_kerusakan?.map((l, i) => (
+                    <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50">
+                      <td className="py-3 px-6">{l.tanggal_laporan}</td>
+                      <td className="py-3 px-6 font-medium">{l.pelapor?.nama}</td>
+                      <td className="py-3 px-6">
+                        <div className="mb-1">{l.deskripsi_kerusakan}</div>
+                        {l.lampiran && (
+                          <a href={`http://localhost:5000${l.lampiran}`} target="_blank" rel="noreferrer" className="text-blue-500 text-xs hover:underline flex items-center gap-1 mt-1">
+                            Lihat Lampiran
+                          </a>
+                        )}
+                      </td>
+                      <td className="py-3 px-6">
+                        <span className={`font-semibold ${l.prioritas === 'Tinggi' ? 'text-red-600' : l.prioritas === 'Sedang' ? 'text-orange-500' : 'text-green-600'}`}>{l.prioritas}</span>
+                      </td>
+                      <td className="py-3 px-6">
+                        <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">{l.status}</span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

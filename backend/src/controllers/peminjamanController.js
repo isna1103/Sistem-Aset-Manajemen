@@ -28,7 +28,7 @@ exports.getByUser = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { aset_id, tanggal_pinjam } = req.body;
+    const { aset_id, tanggal_pinjam, jadwal_kembali, nama_peminjam, divisi } = req.body;
     
     const aset = await Aset.findByPk(aset_id);
     if (!aset) return res.status(404).json({ message: 'Aset tidak ditemukan' });
@@ -37,7 +37,10 @@ exports.create = async (req, res) => {
     const peminjaman = await Peminjaman.create({
       aset_id,
       user_id: req.user.id,
+      nama_peminjam,
+      divisi,
       tanggal_pinjam,
+      jadwal_kembali,
       status: 'Dipinjam'
     });
 
@@ -76,6 +79,26 @@ exports.pengembalian = async (req, res) => {
     });
 
     res.json({ message: 'Pengembalian berhasil dicatat', data: peminjaman });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.delete = async (req, res) => {
+  try {
+    const peminjaman = await Peminjaman.findByPk(req.params.id);
+    if (!peminjaman) return res.status(404).json({ message: 'Data peminjaman tidak ditemukan' });
+
+    // Jika peminjaman belum dikembalikan, ubah status aset kembali menjadi Tersedia
+    if (peminjaman.status === 'Dipinjam') {
+      const aset = await Aset.findByPk(peminjaman.aset_id);
+      if (aset) {
+        await aset.update({ status: 'Tersedia' });
+      }
+    }
+
+    await peminjaman.destroy();
+    res.json({ message: 'Data peminjaman berhasil dihapus' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

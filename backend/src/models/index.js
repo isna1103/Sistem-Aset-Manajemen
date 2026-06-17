@@ -9,6 +9,8 @@ const Peminjaman = require('./Peminjaman');
 const Maintenance = require('./Maintenance');
 const StockOpname = require('./StockOpname');
 const Penghapusan = require('./Penghapusan');
+const Lokasi = require('./Lokasi');
+const LaporanKerusakan = require('./LaporanKerusakan');
 
 // Associations
 
@@ -36,6 +38,14 @@ Peminjaman.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
 Aset.hasMany(Maintenance, { foreignKey: 'aset_id', as: 'maintenance' });
 Maintenance.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
 
+// Aset & LaporanKerusakan
+Aset.hasMany(LaporanKerusakan, { foreignKey: 'aset_id', as: 'laporan_kerusakan' });
+LaporanKerusakan.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
+
+// LaporanKerusakan & Maintenance
+LaporanKerusakan.hasOne(Maintenance, { foreignKey: 'laporan_id', as: 'maintenance' });
+Maintenance.belongsTo(LaporanKerusakan, { foreignKey: 'laporan_id', as: 'laporan' });
+
 // Aset & StockOpname
 Aset.hasMany(StockOpname, { foreignKey: 'aset_id', as: 'stock_opname' });
 StockOpname.belongsTo(Aset, { foreignKey: 'aset_id', as: 'aset' });
@@ -54,6 +64,9 @@ Peminjaman.belongsTo(User, { foreignKey: 'user_id', as: 'peminjam' });
 User.hasMany(Maintenance, { foreignKey: 'user_id', as: 'maintenance' });
 Maintenance.belongsTo(User, { foreignKey: 'user_id', as: 'teknisi' });
 
+User.hasMany(LaporanKerusakan, { foreignKey: 'user_id', as: 'laporan_kerusakan' });
+LaporanKerusakan.belongsTo(User, { foreignKey: 'user_id', as: 'pelapor' });
+
 User.hasMany(StockOpname, { foreignKey: 'user_id', as: 'stock_opname' });
 StockOpname.belongsTo(User, { foreignKey: 'user_id', as: 'pemeriksa' });
 
@@ -71,5 +84,7 @@ module.exports = {
   Peminjaman,
   Maintenance,
   StockOpname,
-  Penghapusan
+  Penghapusan,
+  Lokasi,
+  LaporanKerusakan
 };

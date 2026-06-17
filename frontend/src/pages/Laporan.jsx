@@ -13,6 +13,7 @@ const Laporan = () => {
   const [dataMaintenance, setDataMaintenance] = useState([]);
   const [dataStockOpname, setDataStockOpname] = useState([]);
 
+  const [filterLokasi, setFilterLokasi] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,39 +51,47 @@ const Laporan = () => {
     return new Date().toLocaleDateString('id-ID', options);
   };
 
+  const filteredDataAset = filterLokasi ? dataAset.filter(a => a.lokasi === filterLokasi) : dataAset;
+  const filteredDataMutasi = filterLokasi ? dataMutasi.filter(m => m.lokasi_lama === filterLokasi || m.lokasi_baru === filterLokasi || m.aset?.lokasi === filterLokasi) : dataMutasi;
+  const filteredDataPeminjaman = filterLokasi ? dataPeminjaman.filter(p => p.aset?.lokasi === filterLokasi) : dataPeminjaman;
+  const filteredDataMaintenance = filterLokasi ? dataMaintenance.filter(m => m.aset?.lokasi === filterLokasi) : dataMaintenance;
+  const filteredDataStockOpname = filterLokasi ? dataStockOpname.filter(s => s.aset?.lokasi === filterLokasi) : dataStockOpname;
+
+  const lokasiList = [...new Set(dataAset.map(a => a.lokasi).filter(Boolean))].sort();
+
   // Komponen Ringkasan Dinamis
   const getCards = () => {
     if (activeTab === 'aset') {
       return [
-        { label: 'Total Aset', value: dataAset.length, icon: <Box size={28} />, color: 'bg-green-600' },
-        { label: 'Aset Tersedia', value: dataAset.filter(a => a.status === 'Tersedia').length, icon: <CheckCircle size={28} />, color: 'bg-green-500' },
-        { label: 'Aset Dipinjam', value: dataAset.filter(a => a.status === 'Dipinjam').length, icon: <UserIcon size={28} />, color: 'bg-orange-500' },
-        { label: 'Maintenance', value: dataAset.filter(a => a.status === 'Maintenance').length, icon: <Wrench size={28} />, color: 'bg-purple-600' },
-        { label: 'Aset Rusak', value: dataAset.filter(a => a.kondisi === 'Rusak').length, icon: <AlertTriangle size={28} />, color: 'bg-red-500' },
+        { label: 'Total Aset', value: filteredDataAset.length, icon: <Box size={28} />, color: 'bg-green-600' },
+        { label: 'Aset Tersedia', value: filteredDataAset.filter(a => a.status === 'Tersedia').length, icon: <CheckCircle size={28} />, color: 'bg-green-500' },
+        { label: 'Aset Dipinjam', value: filteredDataAset.filter(a => a.status === 'Dipinjam').length, icon: <UserIcon size={28} />, color: 'bg-orange-500' },
+        { label: 'Maintenance', value: filteredDataAset.filter(a => a.status === 'Maintenance').length, icon: <Wrench size={28} />, color: 'bg-purple-600' },
+        { label: 'Aset Rusak', value: filteredDataAset.filter(a => a.kondisi === 'Rusak').length, icon: <AlertTriangle size={28} />, color: 'bg-red-500' },
       ];
     } else if (activeTab === 'mutasi') {
       return [
-        { label: 'Total Mutasi', value: dataMutasi.length, icon: <ArrowRightLeft size={28} />, color: 'bg-blue-600' },
-        { label: 'Aset Dimutasi', value: new Set(dataMutasi.map(m => m.aset_id)).size, icon: <Box size={28} />, color: 'bg-green-500' },
+        { label: 'Total Mutasi', value: filteredDataMutasi.length, icon: <ArrowRightLeft size={28} />, color: 'bg-blue-600' },
+        { label: 'Aset Dimutasi', value: new Set(filteredDataMutasi.map(m => m.aset_id)).size, icon: <Box size={28} />, color: 'bg-green-500' },
       ];
     } else if (activeTab === 'peminjaman') {
       return [
-        { label: 'Total Transaksi', value: dataPeminjaman.length, icon: <ClipboardList size={28} />, color: 'bg-blue-600' },
-        { label: 'Sedang Dipinjam', value: dataPeminjaman.filter(p => p.status === 'Dipinjam').length, icon: <UserIcon size={28} />, color: 'bg-orange-500' },
-        { label: 'Selesai Dikembalikan', value: dataPeminjaman.filter(p => p.status === 'Dikembalikan').length, icon: <CheckCircle size={28} />, color: 'bg-green-500' },
+        { label: 'Total Transaksi', value: filteredDataPeminjaman.length, icon: <ClipboardList size={28} />, color: 'bg-blue-600' },
+        { label: 'Sedang Dipinjam', value: filteredDataPeminjaman.filter(p => p.status === 'Dipinjam').length, icon: <UserIcon size={28} />, color: 'bg-orange-500' },
+        { label: 'Selesai Dikembalikan', value: filteredDataPeminjaman.filter(p => p.status === 'Dikembalikan').length, icon: <CheckCircle size={28} />, color: 'bg-green-500' },
       ];
     } else if (activeTab === 'maintenance') {
       return [
-        { label: 'Total Maintenance', value: dataMaintenance.length, icon: <Wrench size={28} />, color: 'bg-blue-600' },
-        { label: 'Sedang Proses', value: dataMaintenance.filter(m => m.status === 'Proses').length, icon: <Wrench size={28} />, color: 'bg-orange-500' },
-        { label: 'Selesai', value: dataMaintenance.filter(m => m.status === 'Selesai').length, icon: <CheckCircle size={28} />, color: 'bg-green-500' },
+        { label: 'Total Maintenance', value: filteredDataMaintenance.length, icon: <Wrench size={28} />, color: 'bg-blue-600' },
+        { label: 'Sedang Proses', value: filteredDataMaintenance.filter(m => m.status === 'Proses').length, icon: <Wrench size={28} />, color: 'bg-orange-500' },
+        { label: 'Selesai', value: filteredDataMaintenance.filter(m => m.status === 'Selesai').length, icon: <CheckCircle size={28} />, color: 'bg-green-500' },
       ];
     } else if (activeTab === 'stock_opname') {
       return [
-        { label: 'Total Pengecekan', value: dataStockOpname.length, icon: <ClipboardList size={28} />, color: 'bg-blue-600' },
-        { label: 'Sesuai', value: dataStockOpname.filter(s => s.kondisi_fisik === 'Sesuai').length, icon: <CheckCircle size={28} />, color: 'bg-green-500' },
-        { label: 'Tidak Sesuai', value: dataStockOpname.filter(s => s.kondisi_fisik === 'Tidak Sesuai').length, icon: <AlertTriangle size={28} />, color: 'bg-orange-500' },
-        { label: 'Rusak/Hilang', value: dataStockOpname.filter(s => ['Rusak', 'Hilang'].includes(s.kondisi_fisik)).length, icon: <AlertTriangle size={28} />, color: 'bg-red-500' },
+        { label: 'Total Pengecekan', value: filteredDataStockOpname.length, icon: <ClipboardList size={28} />, color: 'bg-blue-600' },
+        { label: 'Sesuai', value: filteredDataStockOpname.filter(s => s.kondisi_fisik === 'Sesuai').length, icon: <CheckCircle size={28} />, color: 'bg-green-500' },
+        { label: 'Tidak Sesuai', value: filteredDataStockOpname.filter(s => s.kondisi_fisik === 'Tidak Sesuai').length, icon: <AlertTriangle size={28} />, color: 'bg-orange-500' },
+        { label: 'Rusak/Hilang', value: filteredDataStockOpname.filter(s => ['Rusak', 'Hilang'].includes(s.kondisi_fisik)).length, icon: <AlertTriangle size={28} />, color: 'bg-red-500' },
       ];
     }
     return [];
@@ -102,8 +111,8 @@ const Laporan = () => {
   // --- Tabel Konten ---
   const renderTableBody = () => {
     if (activeTab === 'aset') {
-      if (dataAset.length === 0) return <tr><td colSpan="7" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
-      return dataAset.map((item, index) => (
+      if (filteredDataAset.length === 0) return <tr><td colSpan="7" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
+      return filteredDataAset.map((item, index) => (
         <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 text-sm">
           <td className="py-3 px-4 text-center text-gray-600">{index + 1}</td>
           <td className="py-3 px-4 font-medium text-gray-800">{item.kode_aset}</td>
@@ -116,8 +125,8 @@ const Laporan = () => {
       ));
     }
     if (activeTab === 'mutasi') {
-      if (dataMutasi.length === 0) return <tr><td colSpan="7" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
-      return dataMutasi.map((item, index) => (
+      if (filteredDataMutasi.length === 0) return <tr><td colSpan="7" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
+      return filteredDataMutasi.map((item, index) => (
         <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 text-sm">
           <td className="py-3 px-4 text-center text-gray-600">{index + 1}</td>
           <td className="py-3 px-4">{item.aset?.nama_aset} <br /><span className="text-xs text-gray-500">{item.aset?.kode_aset}</span></td>
@@ -130,8 +139,8 @@ const Laporan = () => {
       ));
     }
     if (activeTab === 'peminjaman') {
-      if (dataPeminjaman.length === 0) return <tr><td colSpan="7" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
-      return dataPeminjaman.map((item, index) => (
+      if (filteredDataPeminjaman.length === 0) return <tr><td colSpan="7" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
+      return filteredDataPeminjaman.map((item, index) => (
         <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 text-sm">
           <td className="py-3 px-4 text-center text-gray-600">{index + 1}</td>
           <td className="py-3 px-4">{item.aset?.nama_aset}</td>
@@ -144,8 +153,8 @@ const Laporan = () => {
       ));
     }
     if (activeTab === 'maintenance') {
-      if (dataMaintenance.length === 0) return <tr><td colSpan="6" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
-      return dataMaintenance.map((item, index) => (
+      if (filteredDataMaintenance.length === 0) return <tr><td colSpan="6" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
+      return filteredDataMaintenance.map((item, index) => (
         <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 text-sm">
           <td className="py-3 px-4 text-center text-gray-600">{index + 1}</td>
           <td className="py-3 px-4">{item.aset?.nama_aset}</td>
@@ -157,8 +166,8 @@ const Laporan = () => {
       ));
     }
     if (activeTab === 'stock_opname') {
-      if (dataStockOpname.length === 0) return <tr><td colSpan="6" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
-      return dataStockOpname.map((item, index) => (
+      if (filteredDataStockOpname.length === 0) return <tr><td colSpan="6" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
+      return filteredDataStockOpname.map((item, index) => (
         <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 text-sm">
           <td className="py-3 px-4 text-center text-gray-600">{index + 1}</td>
           <td className="py-3 px-4">{item.aset?.nama_aset}</td>
@@ -210,23 +219,37 @@ const Laporan = () => {
           </button>
         </div>
 
-        {/* Tabs Menu */}
-        <div className="flex flex-wrap border-b border-gray-200 gap-2">
-          {[
-            { id: 'aset', label: 'Pengadaan Aset' },
-            { id: 'mutasi', label: 'Mutasi Aset' },
-            { id: 'peminjaman', label: 'Peminjaman Aset' },
-            { id: 'maintenance', label: 'Maintenance Aset' },
-            { id: 'stock_opname', label: 'Stock Opname' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              className={`py-3 px-4 font-medium text-sm transition-colors rounded-t-lg ${activeTab === tab.id ? 'bg-green-600 text-white' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
-              onClick={() => setActiveTab(tab.id)}
+        {/* Tabs and Filter Menu */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-200 gap-4 pb-0">
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'aset', label: 'Pengadaan Aset' },
+              { id: 'mutasi', label: 'Mutasi Aset' },
+              { id: 'peminjaman', label: 'Peminjaman Aset' },
+              { id: 'maintenance', label: 'Maintenance Aset' },
+              { id: 'stock_opname', label: 'Stock Opname' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                className={`py-3 px-4 font-medium text-sm transition-colors rounded-t-lg ${activeTab === tab.id ? 'bg-green-600 text-white' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3 mb-2">
+            <label className="text-sm font-semibold text-gray-600">Filter Lokasi:</label>
+            <select 
+              className="p-2.5 min-w-[180px] border border-gray-300 rounded-lg outline-none text-sm focus:border-green-500 shadow-sm bg-white"
+              value={filterLokasi}
+              onChange={(e) => setFilterLokasi(e.target.value)}
             >
-              {tab.label}
-            </button>
-          ))}
+              <option value="">Semua Lokasi</option>
+              {lokasiList.map(lok => <option key={lok} value={lok}>{lok}</option>)}
+            </select>
+          </div>
         </div>
 
         {loading ? (
@@ -347,8 +370,8 @@ const Laporan = () => {
                 </thead>
                 <tbody>
                   {/* Reuse Body but add print border classes */}
-                  {activeTab === 'aset' && dataAset.length === 0 && <tr><td colSpan="7" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
-                  {activeTab === 'aset' && dataAset.map((item, index) => (
+                  {activeTab === 'aset' && filteredDataAset.length === 0 && <tr><td colSpan="7" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
+                  {activeTab === 'aset' && filteredDataAset.map((item, index) => (
                     <tr key={index} className="border-b border-gray-200 text-sm">
                       <td className="py-3 px-4 text-center border border-gray-200">{index + 1}</td>
                       <td className="py-3 px-4 border border-gray-200">{item.kode_aset}</td>
@@ -360,8 +383,8 @@ const Laporan = () => {
                     </tr>
                   ))}
 
-                  {activeTab === 'mutasi' && dataMutasi.length === 0 && <tr><td colSpan="7" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
-                  {activeTab === 'mutasi' && dataMutasi.map((item, index) => (
+                  {activeTab === 'mutasi' && filteredDataMutasi.length === 0 && <tr><td colSpan="7" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
+                  {activeTab === 'mutasi' && filteredDataMutasi.map((item, index) => (
                     <tr key={index} className="border-b border-gray-200 text-sm">
                       <td className="py-3 px-4 text-center border border-gray-200">{index + 1}</td>
                       <td className="py-3 px-4 border border-gray-200">{item.aset?.nama_aset} <br /><span className="text-xs text-gray-500">{item.aset?.kode_aset}</span></td>
@@ -373,8 +396,8 @@ const Laporan = () => {
                     </tr>
                   ))}
 
-                  {activeTab === 'peminjaman' && dataPeminjaman.length === 0 && <tr><td colSpan="7" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
-                  {activeTab === 'peminjaman' && dataPeminjaman.map((item, index) => (
+                  {activeTab === 'peminjaman' && filteredDataPeminjaman.length === 0 && <tr><td colSpan="7" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
+                  {activeTab === 'peminjaman' && filteredDataPeminjaman.map((item, index) => (
                     <tr key={index} className="border-b border-gray-200 text-sm">
                       <td className="py-3 px-4 text-center border border-gray-200">{index + 1}</td>
                       <td className="py-3 px-4 border border-gray-200">{item.aset?.nama_aset}</td>
@@ -386,8 +409,8 @@ const Laporan = () => {
                     </tr>
                   ))}
 
-                  {activeTab === 'maintenance' && dataMaintenance.length === 0 && <tr><td colSpan="6" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
-                  {activeTab === 'maintenance' && dataMaintenance.map((item, index) => (
+                  {activeTab === 'maintenance' && filteredDataMaintenance.length === 0 && <tr><td colSpan="6" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
+                  {activeTab === 'maintenance' && filteredDataMaintenance.map((item, index) => (
                     <tr key={index} className="border-b border-gray-200 text-sm">
                       <td className="py-3 px-4 text-center border border-gray-200">{index + 1}</td>
                       <td className="py-3 px-4 border border-gray-200">{item.aset?.nama_aset}</td>
@@ -398,8 +421,8 @@ const Laporan = () => {
                     </tr>
                   ))}
 
-                  {activeTab === 'stock_opname' && dataStockOpname.length === 0 && <tr><td colSpan="6" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
-                  {activeTab === 'stock_opname' && dataStockOpname.map((item, index) => (
+                  {activeTab === 'stock_opname' && filteredDataStockOpname.length === 0 && <tr><td colSpan="6" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
+                  {activeTab === 'stock_opname' && filteredDataStockOpname.map((item, index) => (
                     <tr key={index} className="border-b border-gray-200 text-sm">
                       <td className="py-3 px-4 text-center border border-gray-200">{index + 1}</td>
                       <td className="py-3 px-4 border border-gray-200">{item.aset?.nama_aset}</td>

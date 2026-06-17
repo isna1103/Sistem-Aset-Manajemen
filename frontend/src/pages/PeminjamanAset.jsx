@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { Plus, CheckCircle } from 'lucide-react';
+import { Plus, CheckCircle, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const PeminjamanAset = () => {
@@ -12,8 +12,8 @@ const PeminjamanAset = () => {
   const [showModalPinjam, setShowModalPinjam] = useState(false);
   const [showModalKembali, setShowModalKembali] = useState(false);
   const [selectedPeminjaman, setSelectedPeminjaman] = useState(null);
-  
-  const [formPinjam, setFormPinjam] = useState({ aset_id: '', tanggal_pinjam: '' });
+
+  const [formPinjam, setFormPinjam] = useState({ aset_id: '', tanggal_pinjam: '', jadwal_kembali: '', nama_peminjam: '', divisi: '' });
   const [formKembali, setFormKembali] = useState({ tanggal_kembali: '', kondisi_kembali: 'Baik' });
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const PeminjamanAset = () => {
       await api.post('/peminjaman', formPinjam);
       setShowModalPinjam(false);
       fetchData();
-      setFormPinjam({ aset_id: '', tanggal_pinjam: '' });
+      setFormPinjam({ aset_id: '', tanggal_pinjam: '', jadwal_kembali: '', nama_peminjam: '', divisi: '' });
       Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Peminjaman aset berhasil dicatat!', timer: 1500, showConfirmButton: false });
     } catch (err) {
       Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
@@ -53,15 +53,54 @@ const PeminjamanAset = () => {
   const handleKembaliSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/peminjaman/${selectedPeminjaman.id}/pengembalian`, formKembali);
+      const payload = {
+        ...formKembali,
+        tanggal_kembali: new Date().toISOString().split('T')[0]
+      };
+      await api.put(`/peminjaman/${selectedPeminjaman.id}/pengembalian`, payload);
       setShowModalKembali(false);
       fetchData();
-      setFormKembali({ tanggal_kembali: '', kondisi_kembali: 'Baik' });
+      setFormKembali({ kondisi_kembali: 'Baik' });
       setSelectedPeminjaman(null);
       Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Aset berhasil dikembalikan!', timer: 1500, showConfirmButton: false });
     } catch (err) {
       Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
+  };
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: 'Hapus Data?',
+      text: "Data peminjaman ini akan dihapus secara permanen!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await api.delete(`/peminjaman/${id}`);
+          fetchData();
+          Swal.fire({ icon: 'success', title: 'Terhapus', text: 'Data peminjaman telah dihapus', timer: 1500, showConfirmButton: false });
+        } catch (err) {
+          Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan saat menghapus data' });
+        }
+      }
+    });
+  };
+
+  const getDisplayStatus = (item) => {
+    if (item.status === 'Dikembalikan') return { text: 'Dikembalikan', color: 'bg-green-100 text-green-700' };
+    if (item.status === 'Dipinjam') {
+      const today = new Date().toISOString().split('T')[0];
+      if (item.jadwal_kembali && item.jadwal_kembali < today) {
+        return { text: 'Telat Dikembalikan', color: 'bg-red-100 text-red-700' };
+      }
+      return { text: 'Dipinjam', color: 'bg-yellow-100 text-yellow-700' };
+    }
+    return { text: item.status, color: 'bg-gray-100 text-gray-700' };
   };
 
   return (
@@ -81,18 +120,20 @@ const PeminjamanAset = () => {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100 text-gray-600">
                 <th className="p-4 font-semibold">Aset</th>
-                {user?.role === 'Admin' && <th className="p-4 font-semibold">Peminjam</th>}
+                <th className="p-4 font-semibold">Nama Peminjam</th>
+                <th className="p-4 font-semibold">Divisi</th>
                 <th className="p-4 font-semibold">Tanggal Pinjam</th>
                 <th className="p-4 font-semibold">Status</th>
                 <th className="p-4 font-semibold">Tanggal Kembali</th>
+                <th className="p-4 font-semibold">Kondisi Kembali</th>
                 <th className="p-4 font-semibold text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={user?.role === 'Admin' ? 6 : 5} className="text-center p-4">Loading...</td></tr>
+                <tr><td colSpan={8} className="text-center p-4">Loading...</td></tr>
               ) : peminjaman.length === 0 ? (
-                <tr><td colSpan={user?.role === 'Admin' ? 6 : 5} className="text-center p-4">Belum ada peminjaman</td></tr>
+                <tr><td colSpan={8} className="text-center p-4">Belum ada peminjaman</td></tr>
               ) : (
                 peminjaman.map((item) => (
                   <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
@@ -100,23 +141,36 @@ const PeminjamanAset = () => {
                       <div className="font-medium text-gray-800">{item.aset?.nama_aset}</div>
                       <div className="text-sm text-gray-500">{item.aset?.kode_aset}</div>
                     </td>
-                    {user?.role === 'Admin' && <td className="p-4">{item.peminjam?.nama}</td>}
+                    <td className="p-4">{item.nama_peminjam || '-'}</td>
+                    <td className="p-4">{item.divisi || '-'}</td>
                     <td className="p-4">{item.tanggal_pinjam}</td>
                     <td className="p-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.status === 'Dipinjam' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
-                        {item.status}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDisplayStatus(item).color}`}>
+                        {getDisplayStatus(item).text}
                       </span>
                     </td>
-                    <td className="p-4 text-gray-500">{item.tanggal_kembali || '-'}</td>
+                    <td className="p-4 text-gray-500">{item.tanggal_kembali || item.jadwal_kembali || '-'}</td>
+                    <td className="p-4 text-gray-500">{item.kondisi_kembali || '-'}</td>
                     <td className="p-4 text-center">
-                      {item.status === 'Dipinjam' && (
-                        <button 
-                          onClick={() => { setSelectedPeminjaman(item); setShowModalKembali(true); }}
-                          className="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded-lg text-sm font-medium flex items-center gap-1 mx-auto"
-                        >
-                          <CheckCircle size={16} /> Kembalikan
-                        </button>
-                      )}
+                      <div className="flex justify-center items-center gap-2">
+                        {item.status === 'Dipinjam' && (
+                          <button
+                            onClick={() => { setSelectedPeminjaman(item); setShowModalKembali(true); }}
+                            className="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded-lg text-sm font-medium flex items-center gap-1"
+                          >
+                            <CheckCircle size={16} /> Kembalikan
+                          </button>
+                        )}
+                        {user?.role === 'Admin' && (
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="bg-red-50 text-red-600 hover:bg-red-100 p-1.5 rounded-lg"
+                            title="Hapus Data"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -138,16 +192,36 @@ const PeminjamanAset = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Pilih Aset Tersedia</label>
                 <select required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
-                  value={formPinjam.aset_id} onChange={(e) => setFormPinjam({...formPinjam, aset_id: e.target.value})}
+                  value={formPinjam.aset_id} onChange={(e) => setFormPinjam({ ...formPinjam, aset_id: e.target.value })}
                 >
                   <option value="">-- Pilih Aset --</option>
                   {asetTersedia.map(a => <option key={a.id} value={a.id}>{a.kode_aset} - {a.nama_aset}</option>)}
                 </select>
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Peminjam</label>
+                <input type="text" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
+                  value={formPinjam.nama_peminjam} onChange={(e) => setFormPinjam({ ...formPinjam, nama_peminjam: e.target.value })}
+                  placeholder="Nama yang akan meminjam"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Divisi</label>
+                <input type="text" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
+                  value={formPinjam.divisi} onChange={(e) => setFormPinjam({ ...formPinjam, divisi: e.target.value })}
+                  placeholder="Divisi / Unit"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Pinjam</label>
                 <input type="date" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
-                  value={formPinjam.tanggal_pinjam} onChange={(e) => setFormPinjam({...formPinjam, tanggal_pinjam: e.target.value})}
+                  value={formPinjam.tanggal_pinjam} onChange={(e) => setFormPinjam({ ...formPinjam, tanggal_pinjam: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengembalian</label>
+                <input type="date" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
+                  value={formPinjam.jadwal_kembali} onChange={(e) => setFormPinjam({ ...formPinjam, jadwal_kembali: e.target.value })}
                 />
               </div>
               <div className="flex justify-end gap-3 pt-4">
@@ -172,19 +246,14 @@ const PeminjamanAset = () => {
                 Mengembalikan aset: <strong>{selectedPeminjaman.aset?.nama_aset}</strong>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Kembali</label>
-                <input type="date" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
-                  value={formKembali.tanggal_kembali} onChange={(e) => setFormKembali({...formKembali, tanggal_kembali: e.target.value})}
-                />
-              </div>
-              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Kondisi Saat Dikembalikan</label>
                 <select required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
-                  value={formKembali.kondisi_kembali} onChange={(e) => setFormKembali({...formKembali, kondisi_kembali: e.target.value})}
+                  value={formKembali.kondisi_kembali} onChange={(e) => setFormKembali({ ...formKembali, kondisi_kembali: e.target.value })}
                 >
                   <option value="Baik">Baik</option>
                   <option value="Kurang Baik">Kurang Baik</option>
                   <option value="Rusak">Rusak</option>
+                  <option value="Hilang">Hilang</option>
                 </select>
               </div>
               <div className="flex justify-end gap-3 pt-4">

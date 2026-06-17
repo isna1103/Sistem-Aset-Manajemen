@@ -9,7 +9,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const path = require('path');
 const apiRoutes = require('./src/routes');
+
+// Serve static files (uploads)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Default route
 app.get('/', (req, res) => {
@@ -20,7 +24,7 @@ app.get('/', (req, res) => {
 app.use('/api', apiRoutes);
 
 // Sync DB
-sequelize.sync()
+sequelize.sync({ alter: true })
   .then(() => {
     console.log('Database connected and synced...');
   })

@@ -15,6 +15,7 @@ const PengadaanAset = () => {
     kode_aset: '', nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia'
   });
   const [kategoriList, setKategoriList] = useState([]);
+  const [lokasiList, setLokasiList] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -22,12 +23,14 @@ const PengadaanAset = () => {
 
   const fetchData = async () => {
     try {
-      const [asetRes, katRes] = await Promise.all([
+      const [asetRes, katRes, lokRes] = await Promise.all([
         api.get('/aset'),
-        api.get('/kategori')
+        api.get('/kategori'),
+        api.get('/lokasi')
       ]);
       setAset(asetRes.data);
       setKategoriList(katRes.data);
+      setLokasiList(lokRes.data);
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -119,7 +122,7 @@ const PengadaanAset = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Daftar Aset</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Master Data Aset</h1>
         {hasPermission('Pengadaan Aset', 'Create') && (
           <button 
             onClick={handleOpenModal}
@@ -224,7 +227,10 @@ const PengadaanAset = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
-                <input type="text" name="lokasi" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500" value={formData.lokasi} onChange={handleInputChange} />
+                <select name="lokasi" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500" value={formData.lokasi} onChange={handleInputChange}>
+                  <option value="">Pilih Lokasi</option>
+                  {lokasiList.map(l => <option key={l.id} value={l.nama_lokasi}>{l.nama_lokasi}</option>)}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengadaan</label>
