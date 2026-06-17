@@ -22,7 +22,10 @@ const Header = () => {
 
   return (
     <header className="bg-white shadow-sm py-4 px-6 flex justify-between items-center ml-64 z-10 print:hidden">
-      <h1 className="text-xl font-bold text-gray-800">Sistem Aset Manajemen</h1>
+      <div className="flex items-center gap-3">
+        <img src="/logo_pcs.png" alt="Logo PT" className="h-8 w-auto object-contain rounded-md" />
+        <h1 className="text-xl font-bold text-gray-800">PT. Pandu Cipta Solusi</h1>
+      </div>
       <div className="flex items-center gap-6">
         <span className="text-sm text-gray-500 font-medium">{time}</span>
         <div className="flex items-center gap-3 border-l pl-6 border-gray-200">

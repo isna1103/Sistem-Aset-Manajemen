@@ -12,9 +12,17 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        // We can get details from localStorage too
-        const userInfo = JSON.parse(localStorage.getItem('user'));
-        setUser(userInfo || decoded);
+        
+        // Cek apakah token sudah expired
+        if (decoded.exp * 1000 < Date.now()) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+        } else {
+          // Kita bisa mengambil detail dari localStorage juga
+          const userInfo = JSON.parse(localStorage.getItem('user'));
+          setUser(userInfo || decoded);
+        }
       } catch (err) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');

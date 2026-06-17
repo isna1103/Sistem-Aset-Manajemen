@@ -51,8 +51,14 @@ exports.getByKode = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { kode_aset, nama_aset, kategori_id, lokasi, tanggal_pengadaan, kondisi, status } = req.body;
+    let { kode_aset, nama_aset, kategori_id, lokasi, tanggal_pengadaan, kondisi, status } = req.body;
     
+    if (!kode_aset) {
+      const lastAset = await Aset.findOne({ order: [['id', 'DESC']] });
+      const nextId = lastAset ? lastAset.id + 1 : 1;
+      kode_aset = `AST-${String(nextId).padStart(3, '0')}`;
+    }
+
     // Generate QR Code
     const qrData = JSON.stringify({ kode_aset });
     const qr_code = await QRCode.toDataURL(qrData);

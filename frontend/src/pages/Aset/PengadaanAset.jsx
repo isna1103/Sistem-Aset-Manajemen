@@ -35,6 +35,16 @@ const PengadaanAset = () => {
     }
   };
 
+  const handleOpenModal = () => {
+    const maxId = aset.length > 0 ? Math.max(...aset.map(a => a.id)) : 0;
+    const nextKode = `AST-${String(maxId + 1).padStart(3, '0')}`;
+    setFormData({
+      kode_aset: nextKode,
+      nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia'
+    });
+    setShowModal(true);
+  };
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -112,7 +122,7 @@ const PengadaanAset = () => {
         <h1 className="text-2xl font-bold text-gray-800">Daftar Aset</h1>
         {hasPermission('Pengadaan Aset', 'Create') && (
           <button 
-            onClick={() => setShowModal(true)}
+            onClick={handleOpenModal}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
           >
             <Plus size={20} /> Tambah Aset
@@ -199,7 +209,7 @@ const PengadaanAset = () => {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Kode Aset</label>
-                <input type="text" name="kode_aset" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500" value={formData.kode_aset} onChange={handleInputChange} />
+                <input type="text" name="kode_aset" readOnly className="w-full p-2 border border-gray-300 rounded-lg outline-none bg-gray-100 text-gray-700 font-medium" value={formData.kode_aset} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nama Aset</label>
