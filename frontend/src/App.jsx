@@ -18,6 +18,7 @@ import RoleList from './pages/RolePermission/RoleList';
 import RoleForm from './pages/RolePermission/RoleForm';
 import UserList from './pages/UserManagement/UserList';
 import UserForm from './pages/UserManagement/UserForm';
+import Kategori from './pages/Kategori';
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
             
             <Route path="aset" element={<PengadaanAset />} />
             <Route path="aset/detail/:kode_aset" element={<DetailAset />} />
+            <Route path="kategori" element={<Kategori />} />
             
             <Route path="scan-qr" element={<ScanQR />} />
             

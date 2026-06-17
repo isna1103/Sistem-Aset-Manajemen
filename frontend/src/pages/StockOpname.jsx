@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { ClipboardList, Plus } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const StockOpname = () => {
   const [opname, setOpname] = useState([]);
@@ -35,8 +36,9 @@ const StockOpname = () => {
       setShowModal(false);
       fetchData();
       setFormData({ aset_id: '', tanggal_opname: '', kondisi_fisik: 'Sesuai', keterangan: '' });
+      Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Hasil stock opname berhasil dicatat!', timer: 1500, showConfirmButton: false });
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 

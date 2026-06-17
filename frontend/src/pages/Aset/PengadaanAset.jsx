@@ -3,6 +3,7 @@ import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { Plus, Search, Edit, Trash2, FileText, QrCode } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const PengadaanAset = () => {
   const { user, hasPermission } = useContext(AuthContext);
@@ -47,18 +48,32 @@ const PengadaanAset = () => {
       setFormData({
         kode_aset: '', nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia'
       });
+      Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Aset berhasil ditambahkan!', timer: 1500, showConfirmButton: false });
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Yakin ingin menghapus aset ini?')) {
+    const result = await Swal.fire({
+      title: 'Hapus Aset?',
+      text: 'Anda yakin ingin menghapus aset ini? Data yang terkait mungkin akan terpengaruh.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.delete(`/aset/${id}`);
         fetchData();
+        Swal.fire({ icon: 'success', title: 'Terhapus', text: 'Aset berhasil dihapus.', timer: 1500, showConfirmButton: false });
       } catch (err) {
         console.error(err);
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Gagal menghapus aset' });
       }
     }
   };

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../services/api';
 import { ArrowLeft, Save } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
+import Swal from 'sweetalert2';
 
 const RoleForm = () => {
   const { id } = useParams();
@@ -60,14 +61,14 @@ const RoleForm = () => {
       const payload = { ...formData, permissionIds: selectedPermissions };
       if (id) {
         await api.put(`/roles/${id}`, payload);
-        alert('Role berhasil diperbarui');
+        await Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Role berhasil diperbarui', timer: 1500, showConfirmButton: false });
       } else {
         await api.post('/roles', payload);
-        alert('Role berhasil ditambahkan');
+        await Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Role berhasil ditambahkan', timer: 1500, showConfirmButton: false });
       }
       navigate('/role-permission');
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 

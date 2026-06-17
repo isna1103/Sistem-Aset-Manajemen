@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { Plus, Edit, Trash2, Users } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const UserList = () => {
   const { hasPermission, user: currentUser } = useContext(AuthContext);
@@ -27,18 +28,30 @@ const UserList = () => {
 
   const handleDelete = async (id, username) => {
     if (username === 'admin') {
-      return alert('Akun super-admin tidak dapat dihapus!');
+      return Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Akun super-admin tidak dapat dihapus!' });
     }
     if (username === currentUser?.username) {
-      return alert('Anda tidak dapat menghapus akun Anda sendiri saat sedang login!');
+      return Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Anda tidak dapat menghapus akun Anda sendiri saat sedang login!' });
     }
 
-    if (window.confirm(`Yakin ingin menghapus akun ${username}?`)) {
+    const result = await Swal.fire({
+      title: 'Hapus User?',
+      text: `Yakin ingin menghapus akun ${username}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.delete(`/users/${id}`);
         fetchUsers();
+        Swal.fire({ icon: 'success', title: 'Terhapus', text: 'Akun user berhasil dihapus.', timer: 1500, showConfirmButton: false });
       } catch (err) {
-        alert(err.response?.data?.message || 'Gagal menghapus user');
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Gagal menghapus user' });
       }
     }
   };

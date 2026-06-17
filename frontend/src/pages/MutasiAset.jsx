@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { ArrowRightLeft, Plus } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const MutasiAset = () => {
   const [mutasi, setMutasi] = useState([]);
@@ -37,8 +38,9 @@ const MutasiAset = () => {
       setShowModal(false);
       fetchData();
       setFormData({ aset_id: '', lokasi_baru: '', tanggal_mutasi: '', keterangan: '' });
+      Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Mutasi aset berhasil dicatat!', timer: 1500, showConfirmButton: false });
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 

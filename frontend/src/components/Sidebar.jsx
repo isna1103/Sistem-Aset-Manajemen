@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Box, QrCode, ClipboardList, ArrowRightLeft, ArrowUpFromLine, Wrench, Trash2, FileText, Shield, Users } from 'lucide-react';
+import { LayoutDashboard, Box, QrCode, ClipboardList, ArrowRightLeft, ArrowUpFromLine, Wrench, Trash2, FileText, Shield, Users, Tags } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 
 const Sidebar = () => {
@@ -8,6 +8,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { title: 'Dashboard', menu: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+    { title: 'Kategori Barang', menu: 'Kategori', icon: <Tags size={20} />, path: '/kategori' },
     { title: 'Pengadaan Aset', menu: 'Pengadaan Aset', icon: <Box size={20} />, path: '/aset' },
     { title: 'Scan QR Code', menu: 'QR Code Tracking', icon: <QrCode size={20} />, path: '/scan-qr' },
     { title: 'Mutasi Aset', menu: 'Mutasi Aset', icon: <ArrowRightLeft size={20} />, path: '/mutasi' },

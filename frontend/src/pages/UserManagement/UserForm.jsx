@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../services/api';
 import { ArrowLeft, Save } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const UserForm = () => {
   const { id } = useParams();
@@ -55,14 +56,14 @@ const UserForm = () => {
       if (id) {
         if (!payload.password) delete payload.password; // Don't send empty password on edit
         await api.put(`/users/${id}`, payload);
-        alert('Data user berhasil diperbarui');
+        await Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Data user berhasil diperbarui', timer: 1500, showConfirmButton: false });
       } else {
         await api.post('/users', payload);
-        alert('User berhasil ditambahkan');
+        await Swal.fire({ icon: 'success', title: 'Berhasil', text: 'User berhasil ditambahkan', timer: 1500, showConfirmButton: false });
       }
       navigate('/user-management');
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 

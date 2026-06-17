@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const Kategori = () => {
   const [data, setData] = useState([]);
@@ -32,18 +33,33 @@ const Kategori = () => {
       setShowModal(false);
       fetchData();
       setFormData({ id: null, nama_kategori: '', deskripsi: '' });
+      Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Kategori berhasil disimpan!', timer: 1500, showConfirmButton: false });
     } catch (err) {
       console.error(err);
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Yakin ingin menghapus kategori ini?')) {
+    const result = await Swal.fire({
+      title: 'Hapus Kategori?',
+      text: 'Anda yakin ingin menghapus kategori ini? Data yang terkait mungkin akan terpengaruh.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.delete(`/kategori/${id}`);
         fetchData();
+        Swal.fire({ icon: 'success', title: 'Terhapus', text: 'Kategori berhasil dihapus.', timer: 1500, showConfirmButton: false });
       } catch (err) {
         console.error(err);
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Gagal menghapus kategori' });
       }
     }
   };

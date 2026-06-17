@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Plus, CheckCircle, Wrench } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const MaintenanceAset = () => {
   const [maintenance, setMaintenance] = useState([]);
@@ -36,18 +37,31 @@ const MaintenanceAset = () => {
       setShowModal(false);
       fetchData();
       setFormData({ aset_id: '', tanggal_maintenance: '', deskripsi: '' });
+      Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Maintenance berhasil dijadwalkan!', timer: 1500, showConfirmButton: false });
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 
   const handleSelesai = async (id) => {
-    if (window.confirm('Tandai maintenance ini sebagai selesai? Aset akan kembali ke status Tersedia dengan kondisi Baik.')) {
+    const result = await Swal.fire({
+      title: 'Selesaikan Maintenance?',
+      text: 'Aset akan kembali ke status Tersedia dengan kondisi Baik.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Ya, Selesai!',
+      cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.put(`/maintenance/${id}/selesai`);
         fetchData();
+        Swal.fire({ icon: 'success', title: 'Selesai', text: 'Maintenance aset berhasil diselesaikan.', timer: 1500, showConfirmButton: false });
       } catch (err) {
-        alert('Gagal menyelesaikan maintenance');
+        Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal menyelesaikan maintenance' });
       }
     }
   };

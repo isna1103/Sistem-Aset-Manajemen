@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { Plus, Edit, Trash2, Shield } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const RoleList = () => {
   const { hasPermission } = useContext(AuthContext);
@@ -26,12 +27,24 @@ const RoleList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Yakin ingin menghapus role ini? Role yang sudah digunakan oleh user tidak dapat dihapus.')) {
+    const result = await Swal.fire({
+      title: 'Hapus Role?',
+      text: 'Yakin ingin menghapus role ini? Role yang sudah digunakan oleh user tidak dapat dihapus.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.delete(`/roles/${id}`);
         fetchRoles();
+        Swal.fire({ icon: 'success', title: 'Terhapus', text: 'Role berhasil dihapus.', timer: 1500, showConfirmButton: false });
       } catch (err) {
-        alert(err.response?.data?.message || 'Gagal menghapus role');
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Gagal menghapus role' });
       }
     }
   };

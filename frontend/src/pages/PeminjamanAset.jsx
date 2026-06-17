@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { Plus, CheckCircle } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const PeminjamanAset = () => {
   const { user } = useContext(AuthContext);
@@ -43,8 +44,9 @@ const PeminjamanAset = () => {
       setShowModalPinjam(false);
       fetchData();
       setFormPinjam({ aset_id: '', tanggal_pinjam: '' });
+      Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Peminjaman aset berhasil dicatat!', timer: 1500, showConfirmButton: false });
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 
@@ -56,8 +58,9 @@ const PeminjamanAset = () => {
       fetchData();
       setFormKembali({ tanggal_kembali: '', kondisi_kembali: 'Baik' });
       setSelectedPeminjaman(null);
+      Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Aset berhasil dikembalikan!', timer: 1500, showConfirmButton: false });
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 

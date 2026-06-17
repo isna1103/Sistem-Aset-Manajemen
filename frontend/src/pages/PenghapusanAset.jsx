@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Trash2, AlertTriangle } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const PenghapusanAset = () => {
   const [penghapusan, setPenghapusan] = useState([]);
@@ -31,15 +32,27 @@ const PenghapusanAset = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!window.confirm('Tindakan ini akan mengubah status aset menjadi Dihapus secara permanen. Lanjutkan?')) return;
+    const result = await Swal.fire({
+      title: 'Hapus Permanen?',
+      text: 'Tindakan ini akan mengubah status aset menjadi Dihapus secara permanen. Lanjutkan?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    });
+
+    if (!result.isConfirmed) return;
     
     try {
       await api.post('/penghapusan', formData);
       setShowModal(false);
       fetchData();
       setFormData({ aset_id: '', tanggal_penghapusan: '', alasan: '' });
+      Swal.fire({ icon: 'success', title: 'Terhapus', text: 'Aset berhasil dihapus secara permanen.', timer: 1500, showConfirmButton: false });
     } catch (err) {
-      alert(err.response?.data?.message || 'Terjadi kesalahan');
+      Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
     }
   };
 
