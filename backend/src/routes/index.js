@@ -12,6 +12,7 @@ const mutasiCtrl = require('../controllers/mutasiController');
 const peminjamanCtrl = require('../controllers/peminjamanController');
 const maintenanceCtrl = require('../controllers/maintenanceController');
 const stockOpnameCtrl = require('../controllers/stockOpnameController');
+const jadwalOpnameCtrl = require('../controllers/jadwalOpnameController');
 const penghapusanCtrl = require('../controllers/penghapusanController');
 const roleCtrl = require('../controllers/roleController');
 const laporanCtrl = require('../controllers/laporanController');
@@ -72,7 +73,12 @@ router.get('/maintenance', checkPermission('Maintenance Aset', 'Read/View'), mai
 router.post('/maintenance', checkPermission('Maintenance Aset', 'Create'), maintenanceCtrl.create);
 router.put('/maintenance/:id/selesai', checkPermission('Maintenance Aset', 'Update'), maintenanceCtrl.selesai);
 
-// Stock Opname
+// Stock Opname & Jadwal
+router.get('/jadwal-opname', checkPermission('Stock Opname', 'Read/View'), jadwalOpnameCtrl.getAll);
+router.get('/jadwal-opname/:id', checkPermission('Stock Opname', 'Read/View'), jadwalOpnameCtrl.getById);
+router.post('/jadwal-opname', checkPermission('Stock Opname', 'Create'), jadwalOpnameCtrl.create);
+router.put('/jadwal-opname/:id/status', checkPermission('Stock Opname', 'Update'), jadwalOpnameCtrl.updateStatus);
+
 router.get('/stock-opname', checkPermission('Stock Opname', 'Read/View'), stockOpnameCtrl.getAll);
 router.post('/stock-opname', checkPermission('Stock Opname', 'Create'), stockOpnameCtrl.create);
 

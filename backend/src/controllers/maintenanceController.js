@@ -5,6 +5,7 @@ exports.getAll = async (req, res) => {
     const data = await Maintenance.findAll({
       include: [
         { model: Aset, as: 'aset' },
+        { model: User, as: 'pembuat', attributes: ['id', 'nama', 'username'] },
         { model: User, as: 'teknisi', attributes: ['id', 'nama', 'username'] },
         { model: LaporanKerusakan, as: 'laporan' }
       ],
@@ -33,7 +34,9 @@ exports.create = async (req, res) => {
       tanggal_maintenance,
       deskripsi,
       status: 'Proses',
-      user_id: req.user.id
+      user_id: req.user.id,
+      teknisi_id: laporan.teknisi_id,
+      pihak_ketiga: laporan.pihak_ketiga
     });
 
     await aset.update({ status: 'Maintenance' });

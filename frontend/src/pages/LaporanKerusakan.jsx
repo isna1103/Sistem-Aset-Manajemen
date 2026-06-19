@@ -4,14 +4,14 @@ import { Plus, CheckCircle, XCircle, FileText } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { AuthContext } from '../context/AuthContext';
 
-const LaporanKerusakan = () => {
+const LaporanKerusakan = ({ isTabbed }) => {
   const { user, hasPermission } = useContext(AuthContext);
   const [laporan, setLaporan] = useState([]);
   const [asetList, setAsetList] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [formData, setFormData] = useState({ aset_id: '', tanggal_laporan: '', deskripsi_kerusakan: '', prioritas: 'Sedang' });
+  const [formData, setFormData] = useState({ aset_id: '', tanggal_laporan: '', deskripsi_kerusakan: '', prioritas: 'Sedang', teknisi_id: '', pihak_ketiga: '' });
   const [lampiranFile, setLampiranFile] = useState(null);
 
 
@@ -43,6 +43,8 @@ const LaporanKerusakan = () => {
       data.append('tanggal_laporan', formData.tanggal_laporan);
       data.append('deskripsi_kerusakan', formData.deskripsi_kerusakan);
       data.append('prioritas', formData.prioritas);
+      if (formData.teknisi_id) data.append('teknisi_id', formData.teknisi_id);
+      if (formData.pihak_ketiga) data.append('pihak_ketiga', formData.pihak_ketiga);
       if (lampiranFile) {
         data.append('lampiran_file', lampiranFile);
       }
@@ -54,7 +56,7 @@ const LaporanKerusakan = () => {
       });
       setShowCreateModal(false);
       fetchData();
-      setFormData({ aset_id: '', tanggal_laporan: '', deskripsi_kerusakan: '', prioritas: 'Sedang' });
+      setFormData({ aset_id: '', tanggal_laporan: '', deskripsi_kerusakan: '', prioritas: 'Sedang', teknisi_id: '', pihak_ketiga: '' });
       setLampiranFile(null);
       Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Laporan berhasil dibuat', timer: 1500, showConfirmButton: false });
     } catch (err) {
@@ -87,7 +89,7 @@ const LaporanKerusakan = () => {
   };
 
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'Menunggu Review': return 'bg-yellow-100 text-yellow-700';
       case 'Disetujui': return 'bg-blue-100 text-blue-700';
       case 'Ditolak': return 'bg-red-100 text-red-700';
@@ -98,7 +100,7 @@ const LaporanKerusakan = () => {
   };
 
   const getPriorityColor = (prio) => {
-    switch(prio) {
+    switch (prio) {
       case 'Tinggi': return 'text-red-600 font-semibold';
       case 'Sedang': return 'text-orange-500 font-semibold';
       case 'Rendah': return 'text-green-600 font-semibold';
@@ -107,9 +109,9 @@ const LaporanKerusakan = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Laporan Kerusakan</h1>
+    <div className={isTabbed ? "space-y-4" : "space-y-6"}>
+      <div className={`flex items-center ${isTabbed ? 'justify-end' : 'justify-between'}`}>
+        {!isTabbed && <h1 className="text-2xl font-bold text-gray-800">Laporan Kerusakan</h1>}
         {hasPermission('Laporan Kerusakan', 'Create') && (
           <button onClick={() => setShowCreateModal(true)} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
             <Plus size={20} /> Buat Laporan
@@ -195,7 +197,7 @@ const LaporanKerusakan = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Aset</label>
                 <select required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
-                  value={formData.aset_id} onChange={(e) => setFormData({...formData, aset_id: e.target.value})}
+                  value={formData.aset_id} onChange={(e) => setFormData({ ...formData, aset_id: e.target.value })}
                 >
                   <option value="">Pilih Aset</option>
                   {asetList.map(a => <option key={a.id} value={a.id}>{a.kode_aset} - {a.nama_aset}</option>)}
@@ -204,13 +206,13 @@ const LaporanKerusakan = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Laporan</label>
                 <input type="date" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
-                  value={formData.tanggal_laporan} onChange={(e) => setFormData({...formData, tanggal_laporan: e.target.value})}
+                  value={formData.tanggal_laporan} onChange={(e) => setFormData({ ...formData, tanggal_laporan: e.target.value })}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Prioritas</label>
                 <select className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
-                  value={formData.prioritas} onChange={(e) => setFormData({...formData, prioritas: e.target.value})}
+                  value={formData.prioritas} onChange={(e) => setFormData({ ...formData, prioritas: e.target.value })}
                 >
                   <option value="Rendah">Rendah</option>
                   <option value="Sedang">Sedang</option>
@@ -218,9 +220,15 @@ const LaporanKerusakan = () => {
                 </select>
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Teknisi (Internal / Eksternal)</label>
+                <input type="text" placeholder="Masukkan nama teknisi..." className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
+                  value={formData.pihak_ketiga} onChange={(e) => setFormData({ ...formData, pihak_ketiga: e.target.value, teknisi_id: '' })}
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi Kerusakan</label>
                 <textarea required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500" rows="3"
-                  value={formData.deskripsi_kerusakan} onChange={(e) => setFormData({...formData, deskripsi_kerusakan: e.target.value})}
+                  value={formData.deskripsi_kerusakan} onChange={(e) => setFormData({ ...formData, deskripsi_kerusakan: e.target.value })}
                 ></textarea>
               </div>
               <div>

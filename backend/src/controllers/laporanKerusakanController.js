@@ -9,7 +9,8 @@ exports.getAll = async (req, res) => {
       where: whereClause,
       include: [
         { model: Aset, as: 'aset' },
-        { model: User, as: 'pelapor', attributes: ['id', 'nama', 'username'] }
+        { model: User, as: 'pelapor', attributes: ['id', 'nama', 'username'] },
+        { model: User, as: 'teknisi', attributes: ['id', 'nama', 'username'] }
       ],
       order: [['created_at', 'DESC']]
     });
@@ -21,7 +22,7 @@ exports.getAll = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { aset_id, tanggal_laporan, deskripsi_kerusakan, prioritas } = req.body;
+    const { aset_id, tanggal_laporan, deskripsi_kerusakan, prioritas, teknisi_id, pihak_ketiga } = req.body;
     let lampiran = req.body.lampiran || null;
 
     if (req.file) {
@@ -38,7 +39,9 @@ exports.create = async (req, res) => {
       deskripsi_kerusakan,
       prioritas: prioritas || 'Sedang',
       lampiran,
-      status: 'Menunggu Review'
+      status: 'Menunggu Review',
+      teknisi_id: teknisi_id || null,
+      pihak_ketiga: pihak_ketiga || null
     });
 
     res.status(201).json({ message: 'Laporan kerusakan berhasil dibuat', data: laporan });
@@ -71,7 +74,9 @@ exports.review = async (req, res) => {
         tanggal_maintenance: new Date(),
         deskripsi: laporan.deskripsi_kerusakan,
         status: 'Proses',
-        user_id: req.user.id
+        user_id: req.user.id,
+        teknisi_id: laporan.teknisi_id,
+        pihak_ketiga: laporan.pihak_ketiga
       });
 
       await laporan.update({ status: 'Diproses', catatan_admin });

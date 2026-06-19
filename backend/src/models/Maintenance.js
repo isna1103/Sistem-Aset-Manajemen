@@ -47,6 +47,14 @@ const Maintenance = sequelize.define('Maintenance', {
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false
+  },
+  teknisi_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  pihak_ketiga: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'maintenance',

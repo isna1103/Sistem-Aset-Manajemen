@@ -26,6 +26,18 @@ const StockOpname = sequelize.define('StockOpname', {
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false
+  },
+  jadwal_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  lokasi_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  is_selisih: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 }, {
   tableName: 'stock_opname',

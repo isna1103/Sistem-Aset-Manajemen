@@ -14,8 +14,7 @@ const Sidebar = () => {
     { title: 'Scan QR Code', menu: 'QR Code Tracking', icon: <QrCode size={20} />, path: '/scan-qr' },
     { title: 'Mutasi Aset', menu: 'Mutasi Aset', icon: <ArrowRightLeft size={20} />, path: '/mutasi' },
     { title: 'Peminjaman Aset', menu: 'Peminjaman Aset', icon: <ArrowUpFromLine size={20} />, path: '/peminjaman' },
-    { title: 'Laporan Kerusakan', menu: 'Laporan Kerusakan', icon: <ClipboardList size={20} />, path: '/laporan-kerusakan' },
-    { title: 'Maintenance Aset', menu: 'Maintenance Aset', icon: <Wrench size={20} />, path: '/maintenance' },
+    { title: 'Maintenance Aset', menu: ['Laporan Kerusakan', 'Maintenance Aset'], icon: <Wrench size={20} />, path: '/maintenance' },
     { title: 'Stock Opname', menu: 'Stock Opname', icon: <ClipboardList size={20} />, path: '/stock-opname' },
     { title: 'Penghapusan Aset', menu: 'Penghapusan Aset', icon: <Trash2 size={20} />, path: '/penghapusan' },
     { title: 'Laporan', menu: 'Laporan', icon: <FileText size={20} />, path: '/laporan' },
@@ -30,7 +29,12 @@ const Sidebar = () => {
       </div>
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-2 px-3">
-          {menuItems.filter(item => hasPermission(item.menu, 'Read/View')).map((item, index) => (
+          {menuItems.filter(item => {
+            if (Array.isArray(item.menu)) {
+              return item.menu.some(m => hasPermission(m, 'Read/View'));
+            }
+            return hasPermission(item.menu, 'Read/View');
+          }).map((item, index) => (
             <li key={index}>
               <NavLink
                 to={item.path}

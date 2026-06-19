@@ -11,6 +11,7 @@ const StockOpname = require('./StockOpname');
 const Penghapusan = require('./Penghapusan');
 const Lokasi = require('./Lokasi');
 const LaporanKerusakan = require('./LaporanKerusakan');
+const JadwalOpname = require('./JadwalOpname');
 
 // Associations
 
@@ -61,14 +62,29 @@ Mutasi.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 User.hasMany(Peminjaman, { foreignKey: 'user_id', as: 'peminjaman' });
 Peminjaman.belongsTo(User, { foreignKey: 'user_id', as: 'peminjam' });
 
-User.hasMany(Maintenance, { foreignKey: 'user_id', as: 'maintenance' });
-Maintenance.belongsTo(User, { foreignKey: 'user_id', as: 'teknisi' });
+User.hasMany(Maintenance, { foreignKey: 'user_id', as: 'maintenance_dibuat' });
+Maintenance.belongsTo(User, { foreignKey: 'user_id', as: 'pembuat' });
+
+User.hasMany(Maintenance, { foreignKey: 'teknisi_id', as: 'maintenance_ditangani' });
+Maintenance.belongsTo(User, { foreignKey: 'teknisi_id', as: 'teknisi' });
 
 User.hasMany(LaporanKerusakan, { foreignKey: 'user_id', as: 'laporan_kerusakan' });
 LaporanKerusakan.belongsTo(User, { foreignKey: 'user_id', as: 'pelapor' });
 
+User.hasMany(LaporanKerusakan, { foreignKey: 'teknisi_id', as: 'laporan_teknisi' });
+LaporanKerusakan.belongsTo(User, { foreignKey: 'teknisi_id', as: 'teknisi' });
+
 User.hasMany(StockOpname, { foreignKey: 'user_id', as: 'stock_opname' });
 StockOpname.belongsTo(User, { foreignKey: 'user_id', as: 'pemeriksa' });
+
+User.hasMany(JadwalOpname, { foreignKey: 'penanggung_jawab_id', as: 'jadwal_opname' });
+JadwalOpname.belongsTo(User, { foreignKey: 'penanggung_jawab_id', as: 'penanggung_jawab' });
+
+JadwalOpname.hasMany(StockOpname, { foreignKey: 'jadwal_id', as: 'detail_opname' });
+StockOpname.belongsTo(JadwalOpname, { foreignKey: 'jadwal_id', as: 'jadwal' });
+
+Lokasi.hasMany(StockOpname, { foreignKey: 'lokasi_id', as: 'stock_opname' });
+StockOpname.belongsTo(Lokasi, { foreignKey: 'lokasi_id', as: 'lokasi_aktual' });
 
 User.hasMany(Penghapusan, { foreignKey: 'user_id', as: 'penghapusan' });
 Penghapusan.belongsTo(User, { foreignKey: 'user_id', as: 'penghapus' });
@@ -86,5 +102,6 @@ module.exports = {
   StockOpname,
   Penghapusan,
   Lokasi,
-  LaporanKerusakan
+  LaporanKerusakan,
+  JadwalOpname
 };

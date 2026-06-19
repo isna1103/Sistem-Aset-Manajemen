@@ -16,27 +16,36 @@ exports.getAll = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { aset_id, tanggal_opname, kondisi_fisik, keterangan } = req.body;
+    const { aset_id, jadwal_id, tanggal_opname, kondisi_fisik, lokasi_id, keterangan } = req.body;
     
     const aset = await Aset.findByPk(aset_id);
     if (!aset) return res.status(404).json({ message: 'Aset tidak ditemukan' });
 
+    // Determine discrepancy (Selisih)
+    let is_selisih = false;
+    if (kondisi_fisik !== 'Sesuai') is_selisih = true;
+    if (lokasi_id && parseInt(lokasi_id) !== aset.lokasi_id) is_selisih = true;
+
+    // Check if already scanned in this schedule
+    if (jadwal_id) {
+      const existingScan = await StockOpname.findOne({ where: { jadwal_id, aset_id } });
+      if (existingScan) {
+        return res.status(400).json({ message: 'Aset ini sudah di-scan pada sesi opname ini.' });
+      }
+    }
+
     const opname = await StockOpname.create({
       aset_id,
-      tanggal_opname,
+      jadwal_id: jadwal_id || null,
+      tanggal_opname: tanggal_opname || new Date(),
       kondisi_fisik,
+      lokasi_id: lokasi_id || aset.lokasi_id,
+      is_selisih,
       keterangan,
       user_id: req.user.id
     });
 
-    // Update aset condition if changed during stock opname (optional, let's keep it simple or map it)
-    if (kondisi_fisik === 'Rusak') {
-      await aset.update({ kondisi: 'Rusak' });
-    } else if (kondisi_fisik === 'Hilang') {
-      await aset.update({ status: 'Dihapus' });
-    }
-
-    res.status(201).json({ message: 'Stock Opname berhasil dicatat', data: opname });
+    res.status(201).json({ message: 'Hasil scan berhasil dicatat', data: opname });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

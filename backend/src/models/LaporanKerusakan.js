@@ -40,6 +40,14 @@ const LaporanKerusakan = sequelize.define('LaporanKerusakan', {
   catatan_admin: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  teknisi_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  pihak_ketiga: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'laporan_kerusakan',
