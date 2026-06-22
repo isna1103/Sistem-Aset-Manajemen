@@ -59,7 +59,7 @@ const RoleList = () => {
           <p className="text-gray-500 text-sm mt-1">Kelola hak akses pengguna dalam sistem</p>
         </div>
         {hasPermission('Manajemen Role & Permission', 'Create') && (
-          <Link to="/role-permission/form" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm">
+          <Link to="/role-permission/form" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm">
             <Plus size={20} /> Tambah Role Baru
           </Link>
         )}

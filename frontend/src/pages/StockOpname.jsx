@@ -9,7 +9,7 @@ const StockOpname = () => {
   const { hasPermission } = useContext(AuthContext);
   const [opnameList, setOpnameList] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [showQRModal, setShowQRModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
   const [asetList, setAsetList] = useState([]);
@@ -49,11 +49,11 @@ const StockOpname = () => {
     setShowQRModal(false);
     const aset = asetList.find(a => a.kode_aset === kode_aset || a.id.toString() === kode_aset);
     if (aset) {
-      setFormData({ 
-        aset_id: aset.id, 
-        kondisi_fisik: 'Sesuai', 
-        lokasi_id: aset.lokasi_id, 
-        keterangan: '' 
+      setFormData({
+        aset_id: aset.id,
+        kondisi_fisik: 'Sesuai',
+        lokasi_id: aset.lokasi_id,
+        keterangan: ''
       });
       setShowFormModal(true);
     } else {
@@ -85,7 +85,7 @@ const StockOpname = () => {
           <p className="text-gray-500 text-sm mt-1">Scan aset untuk langsung merekonsiliasi kondisi dan lokasi fisik</p>
         </div>
         {hasPermission('Stock Opname', 'Create') && (
-          <button onClick={() => setShowQRModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-sm transition-colors">
+          <button onClick={() => setShowQRModal(true)} className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-sm transition-colors">
             <QrCode size={20} /> Scan Aset
           </button>
         )}
@@ -164,7 +164,7 @@ const StockOpname = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Kondisi Aktual</label>
                 <select required className="w-full p-2.5 border border-gray-300 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  value={formData.kondisi_fisik} onChange={(e) => setFormData({...formData, kondisi_fisik: e.target.value})}
+                  value={formData.kondisi_fisik} onChange={(e) => setFormData({ ...formData, kondisi_fisik: e.target.value })}
                 >
                   <option value="Sesuai">Sesuai (Baik)</option>
                   <option value="Tidak Sesuai">Tidak Sesuai (Rusak Ringan / Kurang Baik)</option>
@@ -175,7 +175,7 @@ const StockOpname = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Lokasi Aktual (Pilih Jika Pindah)</label>
                 <select required className="w-full p-2.5 border border-gray-300 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  value={formData.lokasi_id} onChange={(e) => setFormData({...formData, lokasi_id: e.target.value})}
+                  value={formData.lokasi_id} onChange={(e) => setFormData({ ...formData, lokasi_id: e.target.value })}
                 >
                   {lokasiList.map(l => <option key={l.id} value={l.id}>{l.nama_lokasi}</option>)}
                 </select>
@@ -183,7 +183,7 @@ const StockOpname = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Keterangan (Opsional)</label>
                 <textarea className="w-full p-2.5 border border-gray-300 rounded-xl outline-none focus:border-blue-500" rows="3"
-                  value={formData.keterangan} onChange={(e) => setFormData({...formData, keterangan: e.target.value})}
+                  value={formData.keterangan} onChange={(e) => setFormData({ ...formData, keterangan: e.target.value })}
                   placeholder="Beri catatan jika ada perbedaan"
                 ></textarea>
               </div>
@@ -197,10 +197,10 @@ const StockOpname = () => {
       )}
 
       {/* Scanner Popup Component */}
-      <QRScannerModal 
-        isOpen={showQRModal} 
-        onClose={() => setShowQRModal(false)} 
-        onScanSuccess={handleScanSuccess} 
+      <QRScannerModal
+        isOpen={showQRModal}
+        onClose={() => setShowQRModal(false)}
+        onScanSuccess={handleScanSuccess}
       />
     </div>
   );

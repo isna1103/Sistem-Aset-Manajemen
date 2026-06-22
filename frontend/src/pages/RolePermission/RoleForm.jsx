@@ -9,7 +9,7 @@ const RoleForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  
+
   const [formData, setFormData] = useState({ nama_role: '', deskripsi: '' });
   const [allPermissions, setAllPermissions] = useState([]);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
@@ -57,7 +57,7 @@ const RoleForm = () => {
 
   const handleSelectAllColumn = (action) => {
     if (formData.nama_role === 'Admin') return;
-    
+
     const permsInAction = allPermissions.filter(p => p.action === action).map(p => p.id);
     if (permsInAction.length === 0) return;
 
@@ -93,7 +93,7 @@ const RoleForm = () => {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 bg-white px-4 py-2 rounded-lg shadow-sm border border-green-100">
           <ArrowLeft size={20} /> Kembali
         </button>
         <h1 className="text-2xl font-bold text-gray-800">{id ? 'Edit Role' : 'Tambah Role Baru'}</h1>
@@ -101,7 +101,7 @@ const RoleForm = () => {
 
       <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
         <form onSubmit={handleSubmit} className="space-y-8">
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Nama Role *</label>
@@ -134,8 +134,8 @@ const RoleForm = () => {
                         return (
                           <td key={action} className="p-3 border border-gray-200 text-center">
                             {perm ? (
-                              <input 
-                                type="checkbox" 
+                              <input
+                                type="checkbox"
                                 className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
                                 checked={selectedPermissions.includes(perm.id)}
                                 onChange={() => handleCheckboxChange(perm.id)}
@@ -158,7 +158,7 @@ const RoleForm = () => {
                       const allSelected = permsInAction.length > 0 && permsInAction.every(id => selectedPermissions.includes(id));
                       return (
                         <td key={action} className="p-3 border border-gray-200 text-center">
-                          <input 
+                          <input
                             type="checkbox"
                             className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
                             checked={allSelected}
