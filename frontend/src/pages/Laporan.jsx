@@ -111,7 +111,7 @@ const Laporan = () => {
   // --- Tabel Konten ---
   const renderTableBody = () => {
     if (activeTab === 'aset') {
-      if (filteredDataAset.length === 0) return <tr><td colSpan="7" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
+      if (filteredDataAset.length === 0) return <tr><td colSpan="8" className="py-4 text-center text-gray-500">Tidak ada data</td></tr>;
       return filteredDataAset.map((item, index) => (
         <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 text-sm">
           <td className="py-3 px-4 text-center text-gray-600">{index + 1}</td>
@@ -119,6 +119,7 @@ const Laporan = () => {
           <td className="py-3 px-4">{item.nama_aset}</td>
           <td className="py-3 px-4">{item.kategori?.nama_kategori || '-'}</td>
           <td className="py-3 px-4">{item.lokasi}</td>
+          <td className="py-3 px-4 text-right">{item.harga ? `Rp ${parseInt(item.harga).toLocaleString()}` : '-'}</td>
           <td className="py-3 px-4 text-center">{item.kondisi}</td>
           <td className="py-3 px-4 text-center">{item.status}</td>
         </tr>
@@ -183,7 +184,7 @@ const Laporan = () => {
   const renderTableHead = () => {
     if (activeTab === 'aset') return (
       <>
-        <th className="py-3 px-4">Kode Aset</th><th className="py-3 px-4">Nama Aset</th><th className="py-3 px-4">Kategori</th><th className="py-3 px-4">Lokasi</th><th className="py-3 px-4 text-center">Kondisi</th><th className="py-3 px-4 text-center">Status</th>
+        <th className="py-3 px-4">Kode Aset</th><th className="py-3 px-4">Nama Aset</th><th className="py-3 px-4">Kategori</th><th className="py-3 px-4">Lokasi</th><th className="py-3 px-4 text-right">Harga</th><th className="py-3 px-4 text-center">Kondisi</th><th className="py-3 px-4 text-center">Status</th>
       </>
     );
     if (activeTab === 'mutasi') return (
@@ -352,7 +353,7 @@ const Laporan = () => {
                     <th className="py-3 px-4 border border-gray-200 text-center w-12 bg-blue-50/50">No</th>
                     {/* Reusing Table Head but modifying classes to include borders for print */}
                     {activeTab === 'aset' && (
-                      <><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Kode Aset</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Nama Aset</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Kategori</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Lokasi</th><th className="py-3 px-4 border border-gray-200 text-center bg-blue-50/50">Kondisi</th><th className="py-3 px-4 border border-gray-200 text-center bg-blue-50/50">Status</th></>
+                      <><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Kode Aset</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Nama Aset</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Kategori</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Lokasi</th><th className="py-3 px-4 border border-gray-200 text-right bg-blue-50/50">Harga</th><th className="py-3 px-4 border border-gray-200 text-center bg-blue-50/50">Kondisi</th><th className="py-3 px-4 border border-gray-200 text-center bg-blue-50/50">Status</th></>
                     )}
                     {activeTab === 'mutasi' && (
                       <><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Aset</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Lokasi Lama</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Lokasi Baru</th><th className="py-3 px-4 border border-gray-200 text-center bg-blue-50/50">Tanggal</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Keterangan</th><th className="py-3 px-4 border border-gray-200 bg-blue-50/50">Diproses Oleh</th></>
@@ -370,7 +371,7 @@ const Laporan = () => {
                 </thead>
                 <tbody>
                   {/* Reuse Body but add print border classes */}
-                  {activeTab === 'aset' && filteredDataAset.length === 0 && <tr><td colSpan="7" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
+                  {activeTab === 'aset' && filteredDataAset.length === 0 && <tr><td colSpan="8" className="py-4 text-center text-gray-500 border border-gray-200">Tidak ada data</td></tr>}
                   {activeTab === 'aset' && filteredDataAset.map((item, index) => (
                     <tr key={index} className="border-b border-gray-200 text-sm">
                       <td className="py-3 px-4 text-center border border-gray-200">{index + 1}</td>
@@ -378,6 +379,7 @@ const Laporan = () => {
                       <td className="py-3 px-4 border border-gray-200">{item.nama_aset}</td>
                       <td className="py-3 px-4 border border-gray-200">{item.kategori?.nama_kategori || '-'}</td>
                       <td className="py-3 px-4 border border-gray-200">{item.lokasi}</td>
+                      <td className="py-3 px-4 text-right border border-gray-200">{item.harga ? `Rp ${parseInt(item.harga).toLocaleString()}` : '-'}</td>
                       <td className="py-3 px-4 text-center border border-gray-200">{item.kondisi}</td>
                       <td className="py-3 px-4 text-center border border-gray-200">{item.status}</td>
                     </tr>

@@ -41,6 +41,14 @@ const Aset = sequelize.define('Aset', {
   qr_code: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  harga: {
+    type: DataTypes.BIGINT,
+    allowNull: true
+  },
+  catatan: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   tableName: 'aset',

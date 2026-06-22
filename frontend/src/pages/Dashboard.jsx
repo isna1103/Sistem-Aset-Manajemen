@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { Box, Wrench, ArrowUpFromLine, Trash2, Activity } from 'lucide-react';
+import { Box, Wrench, ArrowUpFromLine, Trash2, Activity, CircleDollarSign } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -31,6 +31,7 @@ const Dashboard = () => {
     asetDipinjam: 0,
     asetMaintenance: 0,
     asetDihapus: 0,
+    totalHargaAset: 0,
     recentActivity: []
   });
 
@@ -69,6 +70,7 @@ const Dashboard = () => {
 
   const cards = [
     { title: 'Total Seluruh Aset', value: stats.totalAset, icon: <Box size={24} className="text-blue-600" />, bg: 'bg-blue-50' },
+    { title: 'Total Harga Aset', value: `Rp ${stats.totalHargaAset?.toLocaleString('id-ID') || 0}`, icon: <CircleDollarSign size={24} className="text-green-600" />, bg: 'bg-green-50' },
     { title: 'Aset Dipinjam', value: stats.asetDipinjam, icon: <ArrowUpFromLine size={24} className="text-yellow-600" />, bg: 'bg-yellow-50' },
     { title: 'Aset Maintenance', value: stats.asetMaintenance, icon: <Wrench size={24} className="text-orange-600" />, bg: 'bg-orange-50' },
     { title: 'Aset Dihapus', value: stats.asetDihapus, icon: <Trash2 size={24} className="text-red-600" />, bg: 'bg-red-50' },
@@ -82,7 +84,7 @@ const Dashboard = () => {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {cards.map((card, index) => (
           <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
             <div className={`p-4 rounded-lg ${card.bg}`}>

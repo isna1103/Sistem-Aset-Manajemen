@@ -43,6 +43,14 @@ const Peminjaman = sequelize.define('Peminjaman', {
     type: DataTypes.ENUM('Dipinjam', 'Dikembalikan'),
     allowNull: false,
     defaultValue: 'Dipinjam'
+  },
+  lampiran: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  lampiran_kembali: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'peminjaman',

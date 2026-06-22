@@ -78,6 +78,14 @@ const DetailAset = () => {
                   {aset.kondisi}
                 </p>
               </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Harga</p>
+                <p className="text-lg font-semibold text-gray-800">{aset.harga ? `Rp ${parseInt(aset.harga).toLocaleString()}` : '-'}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm text-gray-500 mb-1">Catatan / Deskripsi</p>
+                <p className="text-base text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-100 min-h-[60px]">{aset.catatan || 'Tidak ada catatan'}</p>
+              </div>
             </div>
             <div className="flex flex-col items-center justify-center border-l border-gray-100 pl-8">
               <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">QR Code</p>

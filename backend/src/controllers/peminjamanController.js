@@ -30,6 +30,11 @@ exports.create = async (req, res) => {
   try {
     const { aset_id, tanggal_pinjam, jadwal_kembali, nama_peminjam, divisi } = req.body;
     
+    let lampiran = null;
+    if (req.file) {
+      lampiran = `/uploads/${req.file.filename}`;
+    }
+
     const aset = await Aset.findByPk(aset_id);
     if (!aset) return res.status(404).json({ message: 'Aset tidak ditemukan' });
     if (aset.status !== 'Tersedia') return res.status(400).json({ message: 'Aset tidak tersedia untuk dipinjam' });
@@ -41,6 +46,7 @@ exports.create = async (req, res) => {
       divisi,
       tanggal_pinjam,
       jadwal_kembali,
+      lampiran,
       status: 'Dipinjam'
     });
 
@@ -66,9 +72,15 @@ exports.pengembalian = async (req, res) => {
        return res.status(403).json({ message: 'Akses ditolak' });
     }
 
+    let lampiran_kembali = peminjaman.lampiran_kembali;
+    if (req.file) {
+      lampiran_kembali = `/uploads/${req.file.filename}`;
+    }
+
     await peminjaman.update({
       tanggal_kembali,
       kondisi_kembali,
+      lampiran_kembali,
       status: 'Dikembalikan'
     });
 

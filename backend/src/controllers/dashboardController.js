@@ -7,6 +7,7 @@ exports.getDashboardStats = async (req, res) => {
     const asetDipinjam = await Aset.count({ where: { status: 'Dipinjam' } });
     const asetMaintenance = await Aset.count({ where: { status: 'Maintenance' } });
     const asetDihapus = await Aset.count({ where: { status: 'Dihapus' } });
+    const totalHargaAset = await Aset.sum('harga');
     
     // Aktivitas Terbaru (Gabungan mutasi, peminjaman, dll - asumsikan ambil 5 peminjaman terakhir)
     const recentActivity = await Peminjaman.findAll({
@@ -20,6 +21,7 @@ exports.getDashboardStats = async (req, res) => {
       asetDipinjam,
       asetMaintenance,
       asetDihapus,
+      totalHargaAset: totalHargaAset || 0,
       recentActivity
     });
   } catch (err) {

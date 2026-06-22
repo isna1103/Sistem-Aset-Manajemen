@@ -13,8 +13,8 @@ const PeminjamanAset = () => {
   const [showModalKembali, setShowModalKembali] = useState(false);
   const [selectedPeminjaman, setSelectedPeminjaman] = useState(null);
 
-  const [formPinjam, setFormPinjam] = useState({ aset_id: '', tanggal_pinjam: '', jadwal_kembali: '', nama_peminjam: '', divisi: '' });
-  const [formKembali, setFormKembali] = useState({ tanggal_kembali: '', kondisi_kembali: 'Baik' });
+  const [formPinjam, setFormPinjam] = useState({ aset_id: '', tanggal_pinjam: '', jadwal_kembali: '', nama_peminjam: '', divisi: '', lampiran_file: null });
+  const [formKembali, setFormKembali] = useState({ tanggal_kembali: '', kondisi_kembali: 'Baik', lampiran_kembali_file: null });
 
   useEffect(() => {
     fetchData();
@@ -40,10 +40,22 @@ const PeminjamanAset = () => {
   const handlePinjamSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/peminjaman', formPinjam);
+      const formData = new FormData();
+      formData.append('aset_id', formPinjam.aset_id);
+      formData.append('tanggal_pinjam', formPinjam.tanggal_pinjam);
+      formData.append('jadwal_kembali', formPinjam.jadwal_kembali);
+      formData.append('nama_peminjam', formPinjam.nama_peminjam);
+      formData.append('divisi', formPinjam.divisi);
+      if (formPinjam.lampiran_file) {
+        formData.append('lampiran_file', formPinjam.lampiran_file);
+      }
+
+      await api.post('/peminjaman', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setShowModalPinjam(false);
       fetchData();
-      setFormPinjam({ aset_id: '', tanggal_pinjam: '', jadwal_kembali: '', nama_peminjam: '', divisi: '' });
+      setFormPinjam({ aset_id: '', tanggal_pinjam: '', jadwal_kembali: '', nama_peminjam: '', divisi: '', lampiran_file: null });
       Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Peminjaman aset berhasil dicatat!', timer: 1500, showConfirmButton: false });
     } catch (err) {
       Swal.fire({ icon: 'error', title: 'Gagal', text: err.response?.data?.message || 'Terjadi kesalahan' });
@@ -53,14 +65,19 @@ const PeminjamanAset = () => {
   const handleKembaliSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = {
-        ...formKembali,
-        tanggal_kembali: new Date().toISOString().split('T')[0]
-      };
-      await api.put(`/peminjaman/${selectedPeminjaman.id}/pengembalian`, payload);
+      const formData = new FormData();
+      formData.append('tanggal_kembali', new Date().toISOString().split('T')[0]);
+      formData.append('kondisi_kembali', formKembali.kondisi_kembali);
+      if (formKembali.lampiran_kembali_file) {
+        formData.append('lampiran_kembali_file', formKembali.lampiran_kembali_file);
+      }
+
+      await api.put(`/peminjaman/${selectedPeminjaman.id}/pengembalian`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setShowModalKembali(false);
       fetchData();
-      setFormKembali({ kondisi_kembali: 'Baik' });
+      setFormKembali({ kondisi_kembali: 'Baik', lampiran_kembali_file: null });
       setSelectedPeminjaman(null);
       Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Aset berhasil dikembalikan!', timer: 1500, showConfirmButton: false });
     } catch (err) {
@@ -126,6 +143,8 @@ const PeminjamanAset = () => {
                 <th className="p-4 font-semibold">Status</th>
                 <th className="p-4 font-semibold">Tanggal Kembali</th>
                 <th className="p-4 font-semibold">Kondisi Kembali</th>
+                <th className="p-4 font-semibold text-center">Lampiran Pinjam</th>
+                <th className="p-4 font-semibold text-center">Lampiran Kembali</th>
                 <th className="p-4 font-semibold text-center">Aksi</th>
               </tr>
             </thead>
@@ -151,6 +170,20 @@ const PeminjamanAset = () => {
                     </td>
                     <td className="p-4 text-gray-500">{item.tanggal_kembali || item.jadwal_kembali || '-'}</td>
                     <td className="p-4 text-gray-500">{item.kondisi_kembali || '-'}</td>
+                    <td className="p-4 text-center">
+                      {item.lampiran ? (
+                        <a href={`http://localhost:5000${item.lampiran}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm font-medium">Lihat Foto</a>
+                      ) : (
+                        <span className="text-gray-400 text-sm">-</span>
+                      )}
+                    </td>
+                    <td className="p-4 text-center">
+                      {item.lampiran_kembali ? (
+                        <a href={`http://localhost:5000${item.lampiran_kembali}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm font-medium">Lihat Foto</a>
+                      ) : (
+                        <span className="text-gray-400 text-sm">-</span>
+                      )}
+                    </td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center items-center gap-2">
                         {item.status === 'Dipinjam' && (
@@ -224,6 +257,12 @@ const PeminjamanAset = () => {
                   value={formPinjam.jadwal_kembali} onChange={(e) => setFormPinjam({ ...formPinjam, jadwal_kembali: e.target.value })}
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Upload Foto Lampiran (Opsional)</label>
+                <input type="file" accept="image/*" className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
+                  onChange={(e) => setFormPinjam({ ...formPinjam, lampiran_file: e.target.files[0] })}
+                />
+              </div>
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setShowModalPinjam(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
                 <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Pinjam</button>
@@ -255,6 +294,12 @@ const PeminjamanAset = () => {
                   <option value="Rusak">Rusak</option>
                   <option value="Hilang">Hilang</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Upload Foto Bukti Pengembalian (Opsional)</label>
+                <input type="file" accept="image/*" className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500"
+                  onChange={(e) => setFormKembali({ ...formKembali, lampiran_kembali_file: e.target.files[0] })}
+                />
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setShowModalKembali(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>

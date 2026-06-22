@@ -18,6 +18,7 @@ const roleCtrl = require('../controllers/roleController');
 const laporanCtrl = require('../controllers/laporanController');
 const laporanKerusakanCtrl = require('../controllers/laporanKerusakanController');
 const userRoutes = require('./userRoutes');
+const upload = require('../middlewares/uploadMiddleware');
 
 // Auth
 router.post('/login', authCtrl.login);
@@ -58,12 +59,11 @@ router.post('/mutasi', checkPermission('Mutasi Aset', 'Create'), mutasiCtrl.crea
 // Peminjaman
 router.get('/peminjaman', checkPermission('Peminjaman Aset', 'Read/View'), peminjamanCtrl.getAll);
 router.get('/peminjaman/me', checkPermission('Peminjaman Aset', 'Read/View'), peminjamanCtrl.getByUser); 
-router.post('/peminjaman', checkPermission('Peminjaman Aset', 'Create'), peminjamanCtrl.create);
-router.put('/peminjaman/:id/pengembalian', checkPermission('Pengembalian Aset', 'Create'), peminjamanCtrl.pengembalian); 
+router.post('/peminjaman', checkPermission('Peminjaman Aset', 'Create'), upload.single('lampiran_file'), peminjamanCtrl.create);
+router.put('/peminjaman/:id/pengembalian', checkPermission('Pengembalian Aset', 'Create'), upload.single('lampiran_kembali_file'), peminjamanCtrl.pengembalian); 
 router.delete('/peminjaman/:id', checkPermission('Peminjaman Aset', 'Delete'), peminjamanCtrl.delete);
 
 // Laporan Kerusakan
-const upload = require('../middlewares/uploadMiddleware');
 router.get('/laporan-kerusakan', checkPermission('Laporan Kerusakan', 'Read/View'), laporanKerusakanCtrl.getAll);
 router.post('/laporan-kerusakan', checkPermission('Laporan Kerusakan', 'Create'), upload.single('lampiran_file'), laporanKerusakanCtrl.create);
 router.put('/laporan-kerusakan/:id/review', checkPermission('Laporan Kerusakan', 'Update'), laporanKerusakanCtrl.review);

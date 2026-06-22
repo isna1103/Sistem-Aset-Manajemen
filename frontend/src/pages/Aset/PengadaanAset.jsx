@@ -12,7 +12,7 @@ const PengadaanAset = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    kode_aset: '', nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia'
+    kode_aset: '', nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia', harga: '', catatan: ''
   });
   const [kategoriList, setKategoriList] = useState([]);
   const [lokasiList, setLokasiList] = useState([]);
@@ -43,7 +43,7 @@ const PengadaanAset = () => {
     const nextKode = `AST-${String(maxId + 1).padStart(3, '0')}`;
     setFormData({
       kode_aset: nextKode,
-      nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia'
+      nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia', harga: '', catatan: ''
     });
     setShowModal(true);
   };
@@ -59,7 +59,7 @@ const PengadaanAset = () => {
       setShowModal(false);
       fetchData();
       setFormData({
-        kode_aset: '', nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia'
+        kode_aset: '', nama_aset: '', kategori_id: '', lokasi: '', tanggal_pengadaan: '', kondisi: 'Baik', status: 'Tersedia', harga: '', catatan: ''
       });
       Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Aset berhasil ditambahkan!', timer: 1500, showConfirmButton: false });
     } catch (err) {
@@ -140,6 +140,7 @@ const PengadaanAset = () => {
                 <th className="p-4 font-semibold">Nama Aset</th>
                 <th className="p-4 font-semibold">Kategori</th>
                 <th className="p-4 font-semibold">Lokasi</th>
+                <th className="p-4 font-semibold">Harga</th>
                 <th className="p-4 font-semibold">Kondisi</th>
                 <th className="p-4 font-semibold">Status</th>
                 <th className="p-4 font-semibold text-center">Aksi</th>
@@ -157,6 +158,7 @@ const PengadaanAset = () => {
                     <td className="p-4">{item.nama_aset}</td>
                     <td className="p-4">{item.kategori?.nama_kategori}</td>
                     <td className="p-4">{item.lokasi}</td>
+                    <td className="p-4">{item.harga ? `Rp ${parseInt(item.harga).toLocaleString()}` : '-'}</td>
                     <td className="p-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.kondisi === 'Baik' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         {item.kondisi}
@@ -222,6 +224,14 @@ const PengadaanAset = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengadaan</label>
                 <input type="date" name="tanggal_pengadaan" required className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500" value={formData.tanggal_pengadaan} onChange={handleInputChange} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Harga (Rp)</label>
+                <input type="number" name="harga" className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500" value={formData.harga} onChange={handleInputChange} placeholder="Contoh: 1500000" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Catatan / Deskripsi</label>
+                <textarea name="catatan" className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-green-500" rows="2" value={formData.catatan} onChange={handleInputChange} placeholder="Deskripsi spesifikasi, merk, dll."></textarea>
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>

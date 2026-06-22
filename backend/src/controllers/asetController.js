@@ -51,9 +51,9 @@ exports.getByKode = async (req, res) => {
   }
 };
 
-exports.create = async (req, res) => {
+  exports.create = async (req, res) => {
   try {
-    let { kode_aset, nama_aset, kategori_id, lokasi, tanggal_pengadaan, kondisi, status } = req.body;
+    let { kode_aset, nama_aset, kategori_id, lokasi, tanggal_pengadaan, kondisi, status, harga, catatan } = req.body;
     
     if (!kode_aset) {
       const lastAset = await Aset.findOne({ order: [['id', 'DESC']] });
@@ -73,6 +73,8 @@ exports.create = async (req, res) => {
       tanggal_pengadaan,
       kondisi,
       status,
+      harga,
+      catatan,
       qr_code
     });
     res.status(201).json({ message: 'Aset berhasil ditambahkan', data: newAset });
@@ -83,12 +85,12 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const { nama_aset, kategori_id, lokasi, tanggal_pengadaan, kondisi, status } = req.body;
+    const { nama_aset, kategori_id, lokasi, tanggal_pengadaan, kondisi, status, harga, catatan } = req.body;
     const aset = await Aset.findByPk(req.params.id);
     if (!aset) return res.status(404).json({ message: 'Aset tidak ditemukan' });
 
     await aset.update({
-      nama_aset, kategori_id, lokasi, tanggal_pengadaan, kondisi, status
+      nama_aset, kategori_id, lokasi, tanggal_pengadaan, kondisi, status, harga, catatan
     });
     res.json({ message: 'Aset berhasil diupdate', data: aset });
   } catch (err) {
