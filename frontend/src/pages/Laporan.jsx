@@ -99,7 +99,7 @@ const Laporan = () => {
 
   const getTitle = () => {
     const titles = {
-      aset: 'LAPORAN PENGADAAN ASET',
+      aset: 'LAPORAN MASTER DATA ASET',
       mutasi: 'LAPORAN MUTASI ASET',
       peminjaman: 'LAPORAN PEMINJAMAN ASET',
       maintenance: 'LAPORAN MAINTENANCE ASET',
@@ -223,7 +223,7 @@ const Laporan = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-200 gap-4 pb-0">
           <div className="flex flex-wrap gap-2">
             {[
-              { id: 'aset', label: 'Pengadaan Aset' },
+              { id: 'aset', label: 'Master Data Aset' },
               { id: 'mutasi', label: 'Mutasi Aset' },
               { id: 'peminjaman', label: 'Peminjaman Aset' },
               { id: 'maintenance', label: 'Maintenance Aset' },

@@ -91,27 +91,14 @@ const PengadaanAset = () => {
     }
   };
 
-  const handlePrintQR = (item) => {
+  const handleDownloadQR = (item) => {
     if (!item.qr_code) return alert('QR Code belum tersedia untuk aset ini');
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print QR - ${item.kode_aset}</title>
-          <style>
-            body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: white; }
-            @page { size: 100mm 100mm; margin: 0; }
-          </style>
-        </head>
-        <body>
-          <img src="${item.qr_code}" style="width: 75mm; height: 75mm; object-fit: contain;" />
-          <script>
-            window.onload = () => { setTimeout(() => { window.print(); window.close(); }, 300); }
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+    const link = document.createElement('a');
+    link.href = item.qr_code;
+    link.download = `QR_${item.kode_aset}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const filteredAset = aset.filter(item => 
@@ -123,7 +110,7 @@ const PengadaanAset = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Master Data Aset</h1>
-        {hasPermission('Pengadaan Aset', 'Create') && (
+        {hasPermission('Master Data Aset', 'Create') && (
           <button 
             onClick={handleOpenModal}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
@@ -182,12 +169,12 @@ const PengadaanAset = () => {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-center gap-2">
-                        {hasPermission('Pengadaan Aset', 'Read/View') && (
-                          <button onClick={() => handlePrintQR(item)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Cetak Stiker QR">
+                        {hasPermission('Master Data Aset', 'Read/View') && (
+                          <button onClick={() => handleDownloadQR(item)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Unduh Gambar QR">
                             <QrCode size={18} />
                           </button>
                         )}
-                        {hasPermission('Pengadaan Aset', 'Delete') && (
+                        {hasPermission('Master Data Aset', 'Delete') && (
                           <button onClick={() => handleDelete(item.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Hapus Aset">
                             <Trash2 size={18} />
                           </button>

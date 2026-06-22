@@ -9,8 +9,8 @@ const Sidebar = () => {
   const menuItems = [
     { title: 'Dashboard', menu: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { title: 'Kategori Barang', menu: 'Kategori', icon: <Tags size={20} />, path: '/kategori' },
-    { title: 'Lokasi Aset', menu: 'Pengadaan Aset', icon: <MapPin size={20} />, path: '/lokasi' },
-    { title: 'Master Data Aset', menu: 'Pengadaan Aset', icon: <Box size={20} />, path: '/aset' },
+    { title: 'Lokasi Aset', menu: 'Master Data Aset', icon: <MapPin size={20} />, path: '/lokasi' },
+    { title: 'Master Data Aset', menu: 'Master Data Aset', icon: <Box size={20} />, path: '/aset' },
     { title: 'Scan QR Code', menu: 'QR Code Tracking', icon: <QrCode size={20} />, path: '/scan-qr' },
     { title: 'Mutasi Aset', menu: 'Mutasi Aset', icon: <ArrowRightLeft size={20} />, path: '/mutasi' },
     { title: 'Peminjaman Aset', menu: 'Peminjaman Aset', icon: <ArrowUpFromLine size={20} />, path: '/peminjaman' },

@@ -3,7 +3,7 @@ const { User, Role, Permission, RolePermission } = require('../models');
 
 const menus = [
   'Dashboard',
-  'Pengadaan Aset',
+  'Master Data Aset',
   'Mutasi Aset',
   'Peminjaman Aset',
   'Pengembalian Aset',
@@ -55,7 +55,7 @@ const seedRBAC = async () => {
       (p.menu === 'Peminjaman Aset' && ['Create', 'Read/View'].includes(p.action)) ||
       (p.menu === 'Pengembalian Aset' && ['Create', 'Read/View'].includes(p.action)) ||
       (p.menu === 'QR Code Tracking' && p.action === 'Read/View') ||
-      (p.menu === 'Pengadaan Aset' && p.action === 'Read/View') // Minimal view
+      (p.menu === 'Master Data Aset' && p.action === 'Read/View') // Minimal view
     );
     await staffRole.setPermissions(staffPerms);
 

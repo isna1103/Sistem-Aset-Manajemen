@@ -32,24 +32,24 @@ router.get('/dashboard', checkPermission('Dashboard', 'Read/View'), dashCtrl.get
 // Kategori 
 router.get('/kategori', katCtrl.getAll);
 router.get('/kategori/:id', katCtrl.getById);
-router.post('/kategori', checkPermission('Pengadaan Aset', 'Create'), katCtrl.create);
-router.put('/kategori/:id', checkPermission('Pengadaan Aset', 'Update'), katCtrl.update);
-router.delete('/kategori/:id', checkPermission('Pengadaan Aset', 'Delete'), katCtrl.delete);
+router.post('/kategori', checkPermission('Master Data Aset', 'Create'), katCtrl.create);
+router.put('/kategori/:id', checkPermission('Master Data Aset', 'Update'), katCtrl.update);
+router.delete('/kategori/:id', checkPermission('Master Data Aset', 'Delete'), katCtrl.delete);
 
 // Lokasi
 router.get('/lokasi', lokasiCtrl.getAll);
 router.get('/lokasi/:id', lokasiCtrl.getById);
-router.post('/lokasi', checkPermission('Pengadaan Aset', 'Create'), lokasiCtrl.create);
-router.put('/lokasi/:id', checkPermission('Pengadaan Aset', 'Update'), lokasiCtrl.update);
-router.delete('/lokasi/:id', checkPermission('Pengadaan Aset', 'Delete'), lokasiCtrl.delete);
+router.post('/lokasi', checkPermission('Master Data Aset', 'Create'), lokasiCtrl.create);
+router.put('/lokasi/:id', checkPermission('Master Data Aset', 'Update'), lokasiCtrl.update);
+router.delete('/lokasi/:id', checkPermission('Master Data Aset', 'Delete'), lokasiCtrl.delete);
 
 // Aset
 router.get('/aset', asetCtrl.getAll);
 router.get('/aset/:id', asetCtrl.getById);
 router.get('/aset/kode/:kode', asetCtrl.getByKode); 
-router.post('/aset', checkPermission('Pengadaan Aset', 'Create'), asetCtrl.create);
-router.put('/aset/:id', checkPermission('Pengadaan Aset', 'Update'), asetCtrl.update);
-router.delete('/aset/:id', checkPermission('Pengadaan Aset', 'Delete'), asetCtrl.delete);
+router.post('/aset', checkPermission('Master Data Aset', 'Create'), asetCtrl.create);
+router.put('/aset/:id', checkPermission('Master Data Aset', 'Update'), asetCtrl.update);
+router.delete('/aset/:id', checkPermission('Master Data Aset', 'Delete'), asetCtrl.delete);
 
 // Mutasi
 router.get('/mutasi', checkPermission('Mutasi Aset', 'Read/View'), mutasiCtrl.getAll);
