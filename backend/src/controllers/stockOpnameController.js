@@ -6,7 +6,8 @@ exports.getAll = async (req, res) => {
       include: [
         { model: Aset, as: 'aset' },
         { model: User, as: 'pemeriksa', attributes: ['id', 'nama', 'username'] }
-      ]
+      ],
+      order: [['created_at', 'DESC']]
     });
     res.json(data);
   } catch (err) {
@@ -16,7 +17,7 @@ exports.getAll = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { aset_id, jadwal_id, tanggal_opname, kondisi_fisik, lokasi_id, keterangan } = req.body;
+    const { aset_id, tanggal_opname, kondisi_fisik, lokasi_id, keterangan } = req.body;
     
     const aset = await Aset.findByPk(aset_id);
     if (!aset) return res.status(404).json({ message: 'Aset tidak ditemukan' });
@@ -26,17 +27,9 @@ exports.create = async (req, res) => {
     if (kondisi_fisik !== 'Sesuai') is_selisih = true;
     if (lokasi_id && parseInt(lokasi_id) !== aset.lokasi_id) is_selisih = true;
 
-    // Check if already scanned in this schedule
-    if (jadwal_id) {
-      const existingScan = await StockOpname.findOne({ where: { jadwal_id, aset_id } });
-      if (existingScan) {
-        return res.status(400).json({ message: 'Aset ini sudah di-scan pada sesi opname ini.' });
-      }
-    }
-
     const opname = await StockOpname.create({
       aset_id,
-      jadwal_id: jadwal_id || null,
+      jadwal_id: null,
       tanggal_opname: tanggal_opname || new Date(),
       kondisi_fisik,
       lokasi_id: lokasi_id || aset.lokasi_id,
@@ -45,7 +38,22 @@ exports.create = async (req, res) => {
       user_id: req.user.id
     });
 
-    res.status(201).json({ message: 'Hasil scan berhasil dicatat', data: opname });
+    // Otomatis Rekonsiliasi/Update Data Aset
+    let newKondisi = 'Baik';
+    if (kondisi_fisik === 'Tidak Sesuai') {
+      newKondisi = 'Kurang Baik';
+    } else if (kondisi_fisik === 'Rusak') {
+      newKondisi = 'Rusak';
+    } else if (kondisi_fisik === 'Hilang') {
+      newKondisi = 'Hilang';
+    }
+
+    await aset.update({ 
+      kondisi: newKondisi,
+      lokasi_id: lokasi_id || aset.lokasi_id
+    });
+
+    res.status(201).json({ message: 'Hasil scan berhasil dicatat dan data aset diperbarui', data: opname });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

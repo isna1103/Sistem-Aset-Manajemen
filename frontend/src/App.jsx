@@ -12,7 +12,6 @@ import PeminjamanAset from './pages/PeminjamanAset';
 import LaporanKerusakan from './pages/LaporanKerusakan';
 import MaintenanceAset from './pages/MaintenanceAset';
 import StockOpname from './pages/StockOpname';
-import DetailOpname from './pages/DetailOpname';
 import PenghapusanAset from './pages/PenghapusanAset';
 import ScanQR from './pages/ScanQR';
 import Laporan from './pages/Laporan';
@@ -45,7 +44,6 @@ const App = () => {
             <Route path="laporan-kerusakan" element={<LaporanKerusakan />} />
             <Route path="maintenance" element={<MaintenanceAset />} />
             <Route path="stock-opname" element={<StockOpname />} />
-            <Route path="stock-opname/:id" element={<DetailOpname />} />
             <Route path="penghapusan" element={<PenghapusanAset />} />
             <Route path="laporan" element={<Laporan />} />
             
