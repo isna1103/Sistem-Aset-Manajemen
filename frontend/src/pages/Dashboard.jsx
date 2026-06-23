@@ -70,7 +70,7 @@ const Dashboard = () => {
 
   const cards = [
     { title: 'Total Seluruh Aset', value: stats.totalAset, icon: <Box size={24} className="text-blue-600" />, bg: 'bg-blue-50' },
-    { title: 'Total Harga Aset', value: `Rp ${stats.totalHargaAset?.toLocaleString('id-ID') || 0}`, icon: <CircleDollarSign size={20} className="text-green-600" />, bg: 'bg-green-50' },
+    { title: 'Total Harga Aset', value: `Rp ${stats.totalHargaAset?.toLocaleString('id-ID') || 0}`, icon: <CircleDollarSign size={24} className="text-green-600" />, bg: 'bg-green-50' },
     { title: 'Aset Dipinjam', value: stats.asetDipinjam, icon: <ArrowUpFromLine size={24} className="text-yellow-600" />, bg: 'bg-yellow-50' },
     { title: 'Aset Maintenance', value: stats.asetMaintenance, icon: <Wrench size={24} className="text-orange-600" />, bg: 'bg-orange-50' },
     { title: 'Aset Dihapus', value: stats.asetDihapus, icon: <Trash2 size={24} className="text-red-600" />, bg: 'bg-red-50' },
