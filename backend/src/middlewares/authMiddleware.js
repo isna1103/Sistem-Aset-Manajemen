@@ -49,8 +49,7 @@ const checkPermission = (menu, action) => {
       if (role && role.permissions && role.permissions.length > 0) {
         return next();
       }
-
-      return res.status(403).json({ message: `Forbidden: Require ${action} permission for ${menu}` });
+      return res.status(403).json({ message: `Forbidden: Require ${action} permission for ${menu} (Role: ${req.userRole}, ID: ${role_id}, PermsLen: ${role?.permissions?.length})` });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Unable to validate permissions' });
