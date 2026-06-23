@@ -6,7 +6,8 @@ exports.getAll = async (req, res) => {
       include: [
         { model: Aset, as: 'aset' },
         { model: User, as: 'penghapus', attributes: ['id', 'nama', 'username'] }
-      ]
+      ],
+      order: [['created_at', 'DESC']]
     });
     res.json(data);
   } catch (err) {

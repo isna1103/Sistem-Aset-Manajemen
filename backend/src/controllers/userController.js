@@ -9,7 +9,8 @@ exports.getAllUsers = async (req, res) => {
         as: 'role_info',
         attributes: ['id', 'nama_role', 'deskripsi']
       }],
-      attributes: { exclude: ['password_hash'] }
+      attributes: { exclude: ['password_hash'] },
+      order: [['created_at', 'DESC']]
     });
     res.status(200).json(users);
   } catch (err) {

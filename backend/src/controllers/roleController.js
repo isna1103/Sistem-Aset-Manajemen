@@ -6,7 +6,8 @@ exports.getRoles = async (req, res) => {
       include: [{
         model: Permission,
         as: 'permissions'
-      }]
+      }],
+      order: [['created_at', 'DESC']]
     });
     res.status(200).json(roles);
   } catch (err) {

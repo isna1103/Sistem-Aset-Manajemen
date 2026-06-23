@@ -2,7 +2,9 @@ const { Kategori } = require('../models');
 
 exports.getAll = async (req, res) => {
   try {
-    const data = await Kategori.findAll();
+    const data = await Kategori.findAll({
+      order: [['created_at', 'DESC']]
+    });
     res.json(data);
   } catch (err) {
     res.status(500).json({ message: err.message });

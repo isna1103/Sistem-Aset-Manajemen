@@ -4,7 +4,8 @@ const QRCode = require('qrcode');
 exports.getAll = async (req, res) => {
   try {
     const data = await Aset.findAll({
-      include: [{ model: Kategori, as: 'kategori' }]
+      include: [{ model: Kategori, as: 'kategori' }],
+      order: [['created_at', 'DESC']]
     });
     res.json(data);
   } catch (err) {

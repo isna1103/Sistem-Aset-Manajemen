@@ -6,7 +6,8 @@ exports.getAll = async (req, res) => {
       include: [
         { model: Aset, as: 'aset' },
         { model: User, as: 'peminjam', attributes: ['id', 'nama', 'username'] }
-      ]
+      ],
+      order: [['created_at', 'DESC']]
     });
     res.json(data);
   } catch (err) {
@@ -18,7 +19,8 @@ exports.getByUser = async (req, res) => {
   try {
     const data = await Peminjaman.findAll({
       where: { user_id: req.user.id },
-      include: [{ model: Aset, as: 'aset' }]
+      include: [{ model: Aset, as: 'aset' }],
+      order: [['created_at', 'DESC']]
     });
     res.json(data);
   } catch (err) {
