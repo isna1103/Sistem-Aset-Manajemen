@@ -16,7 +16,7 @@ const Login = () => {
     try {
       const res = await api.post('/login', { username, password });
       login(res.data.accessToken, res.data);
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     }
@@ -29,8 +29,7 @@ const Login = () => {
           <div className="bg-green-100 p-3 rounded-full mb-4">
             <Building2 className="text-green-600 w-10 h-10" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Sistem Aset Manajemen</h1>
-          <p className="text-gray-500">Silahkan Login</p>
+          <h1 className="text-2xl font-bold text-gray-800">Silahkan Login</h1>
         </div>
 
         {error && <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-center text-sm">{error}</div>}

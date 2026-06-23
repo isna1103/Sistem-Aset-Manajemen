@@ -19,6 +19,28 @@ const RoleForm = () => {
   const menus = [...new Set(allPermissions.map(p => p.menu))];
   const actions = ['Create', 'Read/View', 'Update', 'Delete', 'Export'];
 
+  const groupedMenus = {
+    'Asset Management': ['Dashboard', 'Master Data Aset', 'Mutasi Aset', 'Peminjaman Aset', 'Pengembalian Aset', 'Laporan Kerusakan', 'Maintenance Aset', 'Stock Opname', 'QR Code Tracking', 'Penghapusan Aset', 'Laporan'],
+    'Talent Management': ['Data Karyawan', 'Divisi', 'Jabatan', 'Kompetensi', 'Training & Sertifikasi', 'Performance Review', 'Talent Pool', 'Career Path', 'Succession Planning'],
+    'Sistem Inti': ['Manajemen User', 'Manajemen Role & Permission']
+  };
+
+  const moduleGroups = [];
+  const processedMenus = new Set();
+  
+  for (const [groupName, groupMenus] of Object.entries(groupedMenus)) {
+      const activeMenusInGroup = menus.filter(m => groupMenus.includes(m));
+      if (activeMenusInGroup.length > 0) {
+          moduleGroups.push({ groupName, menus: activeMenusInGroup });
+          activeMenusInGroup.forEach(m => processedMenus.add(m));
+      }
+  }
+
+  const otherMenus = menus.filter(m => !processedMenus.has(m));
+  if (otherMenus.length > 0) {
+      moduleGroups.push({ groupName: 'Modul Lainnya', menus: otherMenus });
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,18 +77,21 @@ const RoleForm = () => {
     }
   };
 
-  const handleSelectAllColumn = (action) => {
+  const handleSelectAllGroupColumn = (action, groupMenusList) => {
     if (formData.nama_role === 'Admin') return;
 
-    const permsInAction = allPermissions.filter(p => p.action === action).map(p => p.id);
-    if (permsInAction.length === 0) return;
+    const permsInActionAndGroup = allPermissions
+        .filter(p => p.action === action && groupMenusList.includes(p.menu))
+        .map(p => p.id);
+        
+    if (permsInActionAndGroup.length === 0) return;
 
-    const allSelected = permsInAction.every(id => selectedPermissions.includes(id));
+    const allSelected = permsInActionAndGroup.every(id => selectedPermissions.includes(id));
 
     if (allSelected) {
-      setSelectedPermissions(selectedPermissions.filter(id => !permsInAction.includes(id)));
+      setSelectedPermissions(selectedPermissions.filter(id => !permsInActionAndGroup.includes(id)));
     } else {
-      const newSelected = new Set([...selectedPermissions, ...permsInAction]);
+      const newSelected = new Set([...selectedPermissions, ...permsInActionAndGroup]);
       setSelectedPermissions(Array.from(newSelected));
     }
   };
@@ -125,52 +150,65 @@ const RoleForm = () => {
                     ))}
                   </tr>
                 </thead>
-                <tbody>
-                  {menus.map(menu => (
-                    <tr key={menu} className="hover:bg-gray-50/50">
-                      <td className="p-3 border border-gray-200 font-medium text-gray-800">{menu}</td>
+                {moduleGroups.map((group, groupIndex) => (
+                  <tbody key={`group-${groupIndex}`}>
+                    <tr className="bg-blue-100/50">
+                      <td colSpan={actions.length + 1} className="p-3 border border-gray-200 font-bold text-blue-900 text-sm tracking-wide uppercase">
+                        {group.groupName}
+                      </td>
+                    </tr>
+                    {group.menus.map(menu => (
+                      <tr key={`menu-${menu}`} className="hover:bg-gray-50/50">
+                        <td className="p-3 pl-8 border border-gray-200 font-medium text-gray-800">{menu}</td>
+                        {actions.map(action => {
+                          const perm = allPermissions.find(p => p.menu === menu && p.action === action);
+                          return (
+                            <td key={action} className="p-3 border border-gray-200 text-center">
+                              {perm ? (
+                                <input
+                                  type="checkbox"
+                                  className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                                  checked={selectedPermissions.includes(perm.id)}
+                                  onChange={() => handleCheckboxChange(perm.id)}
+                                  disabled={formData.nama_role === 'Admin'} // Admin can't be unchecked
+                                />
+                              ) : (
+                                <span className="text-gray-300">-</span>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                    {/* Select All Row For This Group */}
+                    <tr className="bg-blue-50/30 border-b-2 border-blue-100">
+                      <td className="p-3 pr-8 border border-gray-200 font-semibold text-blue-800 text-right text-xs uppercase tracking-wide">
+                        Pilih Semua ({group.groupName})
+                      </td>
                       {actions.map(action => {
-                        const perm = allPermissions.find(p => p.menu === menu && p.action === action);
+                        const permsInActionAndGroup = allPermissions
+                          .filter(p => p.action === action && group.menus.includes(p.menu))
+                          .map(p => p.id);
+                        const allSelected = permsInActionAndGroup.length > 0 && permsInActionAndGroup.every(id => selectedPermissions.includes(id));
+                        
                         return (
-                          <td key={action} className="p-3 border border-gray-200 text-center">
-                            {perm ? (
+                          <td key={`select-all-${action}`} className="p-3 border border-gray-200 text-center">
+                            {permsInActionAndGroup.length > 0 ? (
                               <input
                                 type="checkbox"
-                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                                checked={selectedPermissions.includes(perm.id)}
-                                onChange={() => handleCheckboxChange(perm.id)}
-                                disabled={formData.nama_role === 'Admin'} // Admin can't be unchecked
+                                className="w-5 h-5 text-blue-500 rounded focus:ring-blue-400 cursor-pointer"
+                                checked={allSelected}
+                                onChange={() => handleSelectAllGroupColumn(action, group.menus)}
+                                disabled={formData.nama_role === 'Admin'}
+                                title={`Pilih semua akses ${action} untuk ${group.groupName}`}
                               />
-                            ) : (
-                              <span className="text-gray-300">-</span>
-                            )}
+                            ) : null}
                           </td>
                         );
                       })}
                     </tr>
-                  ))}
-                </tbody>
-                <tfoot className="bg-blue-50/30 border-t-2 border-gray-200">
-                  <tr>
-                    <td className="p-3 border border-gray-200 font-semibold text-gray-800 text-right">Pilih Semua (Select All)</td>
-                    {actions.map(action => {
-                      const permsInAction = allPermissions.filter(p => p.action === action).map(p => p.id);
-                      const allSelected = permsInAction.length > 0 && permsInAction.every(id => selectedPermissions.includes(id));
-                      return (
-                        <td key={action} className="p-3 border border-gray-200 text-center">
-                          <input
-                            type="checkbox"
-                            className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                            checked={allSelected}
-                            onChange={() => handleSelectAllColumn(action)}
-                            disabled={formData.nama_role === 'Admin'}
-                            title={`Pilih semua akses ${action}`}
-                          />
-                        </td>
-                      );
-                    })}
-                  </tr>
-                </tfoot>
+                  </tbody>
+                ))}
               </table>
             </div>
           </div>

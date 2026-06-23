@@ -77,9 +77,9 @@ const RoleList = () => {
             </tr>
           </thead>
           <tbody>
-            {roles.map((role) => (
+            {roles.map((role, index) => (
               <tr key={role.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                <td className="py-4 px-6 text-center text-gray-500">{role.id}</td>
+                <td className="py-4 px-6 text-center text-gray-500">{index + 1}</td>
                 <td className="py-4 px-6 font-semibold text-gray-800 flex items-center gap-2">
                   <Shield size={16} className={role.nama_role === 'Admin' ? 'text-red-500' : 'text-blue-500'} />
                   {role.nama_role}

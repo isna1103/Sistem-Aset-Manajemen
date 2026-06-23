@@ -6,6 +6,7 @@ import Layout from '../modules/shared/components/Layout';
 
 // Core Pages
 import Login from '../modules/core/pages/Login';
+import MainDashboard from '../modules/core/pages/MainDashboard';
 import Dashboard from '../modules/core/pages/Dashboard';
 import RoleList from '../modules/core/pages/RolePermission/RoleList';
 import RoleForm from '../modules/core/pages/RolePermission/RoleForm';
@@ -34,7 +35,7 @@ const AppRouter = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Layout />}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<MainDashboard />} />
         
         {/* Core Routes */}
         <Route path="dashboard" element={<Dashboard />} />
