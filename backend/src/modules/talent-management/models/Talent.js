@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../../shared/database/db'); // Adjust if db.js is named differently
+const sequelize = require('../../../config/database');
 
 const Talent = sequelize.define('Talent', {
   id: {

@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 app.use('/api', apiRoutes);
 
 // Sync DB
-sequelize.sync({ alter: true })
+sequelize.sync()
   .then(() => {
     console.log('Database connected and synced...');
   })
