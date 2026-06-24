@@ -21,7 +21,7 @@ const verifyToken = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  if (req.userRole === 'Admin') {
+  if (req.userRole && req.userRole.toLowerCase() === 'admin') {
     next();
     return;
   }
@@ -32,7 +32,7 @@ const checkPermission = (menu, action) => {
   return async (req, res, next) => {
     try {
       // If user is Admin, grant full access
-      if (req.userRole === 'Admin') return next();
+      if (req.userRole && req.userRole.toLowerCase() === 'admin') return next();
 
       const role_id = req.user.role_id;
       if (!role_id) return res.status(403).json({ message: 'No role assigned to user.' });
@@ -52,7 +52,7 @@ const checkPermission = (menu, action) => {
       return res.status(403).json({ message: `Forbidden: Require ${action} permission for ${menu} (Role: ${req.userRole}, ID: ${role_id}, PermsLen: ${role?.permissions?.length})` });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ message: 'Unable to validate permissions' });
+      res.status(500).json({ message: 'Unable to validate permissions: ' + err.message });
     }
   };
 };

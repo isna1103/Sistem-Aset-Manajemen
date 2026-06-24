@@ -54,7 +54,6 @@ const UserForm = () => {
     try {
       const payload = { ...formData };
       if (id) {
-        if (!payload.password) delete payload.password; // Don't send empty password on edit
         await api.put(`/users/${id}`, payload);
         await Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Data user berhasil diperbarui', timer: 1500, showConfirmButton: false });
       } else {
@@ -94,9 +93,9 @@ const UserForm = () => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Password {id ? '(Opsional)' : '*'}
+              Password *
             </label>
-            <input type="password" name="password" value={formData.password} onChange={handleChange} required={!id} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder={id ? "Kosongkan jika tidak ingin mengubah password" : "Password untuk login"} />
+            <input type="password" name="password" value={formData.password} onChange={handleChange} required className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan password" />
           </div>
 
           <div>

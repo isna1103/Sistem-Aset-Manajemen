@@ -20,7 +20,7 @@ const UserList = () => {
       setUsers(res.data);
     } catch (err) {
       console.error(err);
-      alert('Gagal mengambil data user');
+      alert('Gagal mengambil data user: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }

@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
 
   const hasPermission = (menu, action) => {
     if (!user) return false;
-    if (user.role === 'Admin') return true; // Full access for Admin
+    if (user.role && user.role.toLowerCase() === 'admin') return true; // Full access for Admin
     if (!user.permissions || !Array.isArray(user.permissions)) return false;
     return user.permissions.some(p => p.menu === menu && p.action === action);
   };
